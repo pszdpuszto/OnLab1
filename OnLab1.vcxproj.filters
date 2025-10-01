@@ -1,0 +1,120 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Header Files\core">
+      <UniqueIdentifier>{afa65aec-bbf7-43af-b6b0-4e5a4d7d3977}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\object">
+      <UniqueIdentifier>{9295bac6-a11d-4b9d-befb-3fb992887263}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\object\entity">
+      <UniqueIdentifier>{b3ce2447-f03b-417d-bf24-5dc975d13a23}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\object\player">
+      <UniqueIdentifier>{89b2ae84-18b4-4f8a-874a-228ee58bac45}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\level">
+      <UniqueIdentifier>{4410c584-c0cb-45e3-b683-9681b8644c57}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\level\room">
+      <UniqueIdentifier>{ee6c4662-7675-44b6-83e5-51fe084e662a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\core">
+      <UniqueIdentifier>{8d643477-fa33-43c9-a098-70ba158c9f8e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\level">
+      <UniqueIdentifier>{6721e921-5886-462a-8c8d-28f2e5cc59fe}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\object">
+      <UniqueIdentifier>{e0336f46-c9cc-4be0-a965-3b9a12a90ded}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\level\room">
+      <UniqueIdentifier>{066af089-cea8-4218-9eef-336b517013a5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\object\entity">
+      <UniqueIdentifier>{ef3d8033-319b-4bc5-a547-9f92a3085cc5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\object\player">
+      <UniqueIdentifier>{e0238d67-b140-4d32-b1ca-401125cdf4e0}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\Consts.hpp">
+      <Filter>Header Files\core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Game.hpp">
+      <Filter>Header Files\core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Utils.hpp">
+      <Filter>Header Files\core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Entity.hpp">
+      <Filter>Header Files\object\entity</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Level.hpp">
+      <Filter>Header Files\level</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Object.hpp">
+      <Filter>Header Files\object</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Player.hpp">
+      <Filter>Header Files\object\player</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Room.hpp">
+      <Filter>Header Files\level\room</Filter>
+    </ClInclude>
+    <ClInclude Include="src\TestLevel.hpp">
+      <Filter>Header Files\level</Filter>
+    </ClInclude>
+    <ClInclude Include="Application.hpp">
+      <Filter>Header Files\core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\TestRoom.hpp">
+      <Filter>Header Files\level\room</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\Entity.cpp">
+      <Filter>Source Files\object\entity</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Game.cpp">
+      <Filter>Source Files\core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Level.cpp">
+      <Filter>Source Files\level</Filter>
+    </ClCompile>
+    <ClCompile Include="src\main.cpp">
+      <Filter>Source Files\core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Object.cpp">
+      <Filter>Source Files\object</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Player.cpp">
+      <Filter>Source Files\object\player</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Room.cpp">
+      <Filter>Source Files\level\room</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TestLevel.cpp">
+      <Filter>Source Files\level</Filter>
+    </ClCompile>
+    <ClCompile Include="Application.cpp">
+      <Filter>Source Files\core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TestRoom.cpp">
+      <Filter>Source Files\level\room</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>
