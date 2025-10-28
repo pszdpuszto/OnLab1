@@ -130,29 +130,37 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="Application.hpp" />
-    <ClInclude Include="src\Consts.hpp" />
-    <ClInclude Include="src\Entity.hpp" />
-    <ClInclude Include="src\Game.hpp" />
-    <ClInclude Include="src\Level.hpp" />
-    <ClInclude Include="src\Object.hpp" />
-    <ClInclude Include="src\Player.hpp" />
-    <ClInclude Include="src\Room.hpp" />
-    <ClInclude Include="src\TestLevel.hpp" />
-    <ClInclude Include="src\TestRoom.hpp" />
-    <ClInclude Include="src\Utils.hpp" />
+    <Image Include="Assets\bg.png" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Application.cpp" />
-    <ClCompile Include="src\Entity.cpp" />
-    <ClCompile Include="src\Game.cpp" />
-    <ClCompile Include="src\Level.cpp" />
-    <ClCompile Include="src\main.cpp" />
-    <ClCompile Include="src\Object.cpp" />
-    <ClCompile Include="src\Player.cpp" />
-    <ClCompile Include="src\Room.cpp" />
-    <ClCompile Include="src\TestLevel.cpp" />
-    <ClCompile Include="src\TestRoom.cpp" />
+    <ClInclude Include="src\header\Application.hpp" />
+    <ClInclude Include="src\header\Consts.hpp" />
+    <ClInclude Include="src\header\Entity.hpp" />
+    <ClInclude Include="src\header\Game.hpp" />
+    <ClInclude Include="src\header\Level.hpp" />
+    <ClInclude Include="src\header\Object.hpp" />
+    <ClInclude Include="src\header\ObjectSprite.hpp" />
+    <ClInclude Include="src\header\Obstacles.hpp" />
+    <ClInclude Include="src\header\Player.hpp" />
+    <ClInclude Include="src\header\ResourceManager.hpp" />
+    <ClInclude Include="src\header\Room.hpp" />
+    <ClInclude Include="src\header\TestLevel.hpp" />
+    <ClInclude Include="src\header\TestRoom.hpp" />
+    <ClInclude Include="src\header\Utils.hpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\source\Application.cpp" />
+    <ClCompile Include="src\source\Entity.cpp" />
+    <ClCompile Include="src\source\Game.cpp" />
+    <ClCompile Include="src\source\Level.cpp" />
+    <ClCompile Include="src\source\main.cpp" />
+    <ClCompile Include="src\source\Object.cpp" />
+    <ClCompile Include="src\source\ObjectSprite.cpp" />
+    <ClCompile Include="src\source\Player.cpp" />
+    <ClCompile Include="src\source\ResourceManager.cpp" />
+    <ClCompile Include="src\source\Room.cpp" />
+    <ClCompile Include="src\source\TestLevel.cpp" />
+    <ClCompile Include="src\source\TestRoom.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

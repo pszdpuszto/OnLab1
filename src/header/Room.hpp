@@ -1,15 +1,11 @@
 #pragma once
 
-#include <vector>;
+#include <vector>
 
-#include "object.hpp";
+#include "object.hpp"
 #include "entity.hpp"
 
 class Room {
-protected:
-	std::vector<Object*> _objects = std::vector<Object*>();
-	std::vector<Entity*> _entities = std::vector<Entity*>();
-
 public:
 	Room();
 	~Room();
@@ -21,4 +17,7 @@ public:
 	void update();
 	void render() const;
 
+protected:
+	std::vector<Object*> _objects = std::vector<Object*>();
+	std::vector<Entity*> _entities = std::vector<Entity*>();
 };

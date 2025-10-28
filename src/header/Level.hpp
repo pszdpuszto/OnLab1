@@ -5,11 +5,6 @@
 #include "room.hpp"
 
 class Level {
-protected:
-	std::vector<Room*> _rooms = std::vector<Room*>();
-	Room* _currentRoom;
-	
-	virtual Room* generateRooms() = 0;
 public:
 	Level();
 	~Level();
@@ -17,4 +12,10 @@ public:
 	Room* getCurrentRoom() const {
 		return _currentRoom;
 	}
+
+protected:
+	std::vector<Room*> _rooms = std::vector<Room*>();
+	Room* _currentRoom;
+	
+	virtual Room* generateRooms() = 0;
 };

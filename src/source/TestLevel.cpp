@@ -1,5 +1,6 @@
-#include "testLevel.hpp"
-#include "TestRoom.hpp"
+#include "../header/TestLevel.hpp"
+
+#include "../header/TestRoom.hpp"
 
 Room* TestLevel::generateRooms()
 {

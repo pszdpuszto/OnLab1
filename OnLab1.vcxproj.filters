@@ -22,9 +22,6 @@
     <Filter Include="Header Files\object\entity">
       <UniqueIdentifier>{b3ce2447-f03b-417d-bf24-5dc975d13a23}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\object\player">
-      <UniqueIdentifier>{89b2ae84-18b4-4f8a-874a-228ee58bac45}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\level">
       <UniqueIdentifier>{4410c584-c0cb-45e3-b683-9681b8644c57}</UniqueIdentifier>
     </Filter>
@@ -49,71 +46,97 @@
     <Filter Include="Source Files\object\player">
       <UniqueIdentifier>{e0238d67-b140-4d32-b1ca-401125cdf4e0}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\object\obstacle">
+      <UniqueIdentifier>{f6bb98ff-4e40-4e5c-b047-056c51feeb39}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\object\entity\player">
+      <UniqueIdentifier>{89b2ae84-18b4-4f8a-874a-228ee58bac45}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\Consts.hpp">
+    <Image Include="Assets\bg.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\header\Application.hpp">
       <Filter>Header Files\core</Filter>
     </ClInclude>
-    <ClInclude Include="src\Game.hpp">
+    <ClInclude Include="src\header\Consts.hpp">
       <Filter>Header Files\core</Filter>
     </ClInclude>
-    <ClInclude Include="src\Utils.hpp">
-      <Filter>Header Files\core</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Entity.hpp">
+    <ClInclude Include="src\header\Entity.hpp">
       <Filter>Header Files\object\entity</Filter>
     </ClInclude>
-    <ClInclude Include="src\Level.hpp">
-      <Filter>Header Files\level</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Object.hpp">
-      <Filter>Header Files\object</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Player.hpp">
-      <Filter>Header Files\object\player</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Room.hpp">
-      <Filter>Header Files\level\room</Filter>
-    </ClInclude>
-    <ClInclude Include="src\TestLevel.hpp">
-      <Filter>Header Files\level</Filter>
-    </ClInclude>
-    <ClInclude Include="Application.hpp">
+    <ClInclude Include="src\header\Game.hpp">
       <Filter>Header Files\core</Filter>
     </ClInclude>
-    <ClInclude Include="src\TestRoom.hpp">
+    <ClInclude Include="src\header\Level.hpp">
+      <Filter>Header Files\level</Filter>
+    </ClInclude>
+    <ClInclude Include="src\header\Object.hpp">
+      <Filter>Header Files\object</Filter>
+    </ClInclude>
+    <ClInclude Include="src\header\ObjectSprite.hpp">
+      <Filter>Header Files\object</Filter>
+    </ClInclude>
+    <ClInclude Include="src\header\Player.hpp">
+      <Filter>Header Files\object\entity\player</Filter>
+    </ClInclude>
+    <ClInclude Include="src\header\ResourceManager.hpp">
+      <Filter>Header Files\core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\header\Room.hpp">
       <Filter>Header Files\level\room</Filter>
+    </ClInclude>
+    <ClInclude Include="src\header\TestLevel.hpp">
+      <Filter>Header Files\level</Filter>
+    </ClInclude>
+    <ClInclude Include="src\header\TestRoom.hpp">
+      <Filter>Header Files\level\room</Filter>
+    </ClInclude>
+    <ClInclude Include="src\header\Utils.hpp">
+      <Filter>Header Files\core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\header\Obstacles.hpp">
+      <Filter>Header Files\object\obstacle</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\Entity.cpp">
+    <ClCompile Include="src\source\Application.cpp">
+      <Filter>Source Files\core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\source\Entity.cpp">
       <Filter>Source Files\object\entity</Filter>
     </ClCompile>
-    <ClCompile Include="src\Game.cpp">
+    <ClCompile Include="src\source\Game.cpp">
       <Filter>Source Files\core</Filter>
     </ClCompile>
-    <ClCompile Include="src\Level.cpp">
+    <ClCompile Include="src\source\Level.cpp">
       <Filter>Source Files\level</Filter>
     </ClCompile>
-    <ClCompile Include="src\main.cpp">
+    <ClCompile Include="src\source\main.cpp">
       <Filter>Source Files\core</Filter>
     </ClCompile>
-    <ClCompile Include="src\Object.cpp">
+    <ClCompile Include="src\source\Object.cpp">
       <Filter>Source Files\object</Filter>
     </ClCompile>
-    <ClCompile Include="src\Player.cpp">
+    <ClCompile Include="src\source\ObjectSprite.cpp">
+      <Filter>Source Files\object</Filter>
+    </ClCompile>
+    <ClCompile Include="src\source\Player.cpp">
       <Filter>Source Files\object\player</Filter>
     </ClCompile>
-    <ClCompile Include="src\Room.cpp">
-      <Filter>Source Files\level\room</Filter>
-    </ClCompile>
-    <ClCompile Include="src\TestLevel.cpp">
-      <Filter>Source Files\level</Filter>
-    </ClCompile>
-    <ClCompile Include="Application.cpp">
+    <ClCompile Include="src\source\ResourceManager.cpp">
       <Filter>Source Files\core</Filter>
     </ClCompile>
-    <ClCompile Include="src\TestRoom.cpp">
+    <ClCompile Include="src\source\Room.cpp">
+      <Filter>Source Files\level\room</Filter>
+    </ClCompile>
+    <ClCompile Include="src\source\TestLevel.cpp">
+      <Filter>Source Files\level</Filter>
+    </ClCompile>
+    <ClCompile Include="src\source\TestRoom.cpp">
       <Filter>Source Files\level\room</Filter>
     </ClCompile>
   </ItemGroup>
