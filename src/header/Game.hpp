@@ -9,7 +9,9 @@
 #include "player.hpp"
 #include "Utils.hpp"
 #include "ResourceManager.hpp"
-#include "ObjectSprite.hpp"
+#include "Item.hpp"
+
+#define GAME Game::getInstance()
 
 class Game {
 public:
@@ -22,10 +24,18 @@ public:
 
 	Level* getCurrentLevel() const;
 	Utils::WASDState getWASDState() const;
+	Utils::floatPoint getMousePosition() const;
 
-	ObjectSprite* createObjectSprite(const std::string& textureName) const;
+	ResourceManager::StaticSprite* createStaticSprite(const std::string& textureName, const SDL_FRect& destRect) const;
+	ResourceManager::TextSprite* createTextSprite(const std::string& text, const SDL_Color& bgColor={0x00,0x00,0x00,0x00}) const;
+	Object::Sprite createObjectSprite(const std::string& textureName) const;
+	Item::Sprite createItemSprite(const std::string& name) const;
 
+	void renderFullRect(const SDL_FRect& rect, const Utils::RGB& color) const;
 	void renderRect(const SDL_FRect& rect, const Utils::RGB& color) const;
+	void dimScreen(float intensity) const;
+
+	bool isMouseInRect(const SDL_FRect& rect);
 
 	void startGameLoop();
 private:
@@ -37,10 +47,18 @@ private:
 	SDL_Window* _window;
 
 	ResourceManager* _resourceManager;
+	enum CursorType { POINT = 0, AIM, CursorType_SIZE };
+	ResourceManager::StaticSprite* _cursorSprite[CursorType_SIZE];
+	ResourceManager::StaticSprite* _bgSprite;
 
 	Level* _currentLevel;
 	Player* _player;
 	Utils::WASDState _wasdState = 0;
+	Utils::floatPoint _mousePosition = { 0.f, 0.f };
+
+	void initSprites();
+
+	void setMousePosition(float x, float y);
 
 	void tick();
 	void handleEvents();

@@ -1,6 +1,8 @@
 #pragma once
 
 #include <SDL3/SDL.h>
+#include <SDL3_ttf/SDL_ttf.h>
+
 #include <map>
 #include <string>
 #include <vector>
@@ -9,26 +11,78 @@
 class ResourceManager
 {
 public:
-	struct TextureData {
-		SDL_Texture* texture;
+	/**
+	* Spritesheet data. The texture itself is managed by ResourceManager.
+	*/
+	struct ObjectTextureData {
+		SDL_Texture* _texture;
 		int width;
 		int height;
 		std::vector<int> frameCount;
 	};
 
-	ResourceManager(SDL_Renderer* renderer);
+	class StaticSprite {
+	public:
+		StaticSprite(SDL_Renderer* renderer, SDL_Texture* texture, const SDL_FRect& destRect);
+
+		void setPos(float x, float y);
+
+		void render() const;
+	protected:
+		SDL_Renderer* _renderer;
+		SDL_Texture* _texture; // Managed by ResourceManager
+		SDL_FRect _destRect;
+
+	};
+
+	class TextSprite : public StaticSprite {
+	public:
+		TextSprite(SDL_Renderer* renderer, SDL_Texture* texture, const SDL_FRect& destRect);
+		TextSprite(const TextSprite& other) = delete;
+		TextSprite operator=(const TextSprite& other) = delete;
+		~TextSprite(); // _texture isn't managed by ResourceManager
+
+		void setPosFitToWindow(float x, float y);
+	};
+
+	ResourceManager(SDL_Renderer* renderer, const std::string& font);
 	~ResourceManager();
 
-	const TextureData& getObjectTextureData(const std::string& textureName);
-	SDL_Texture* getSimpleTexture(const std::string& textureName);
+	const ObjectTextureData& getObjectTextureData(const std::string& textureName);
+	SDL_Texture* getTexture(const std::string& textureName);
+	SDL_FRect getItemSpriteSrcRect(const std::string& itemName);
+
+	/**
+	* Creates an SDL_Texture from a string using the game's font.
+	* @param text The string to create a texture from. It can contain multiple lines separated by '$N$'. The font size can be specified by using the tag
+	* $S<size>$ before the text, where <size> is an integer representing the font size. This also represents a new line.
+	* For example, "$S24$Hello" will render "Hello" with a font size of 24.
+	* The color of the text can similarly be specified using the tag $C<r>,<g>,<b>$, where <r>, <g>, and <b> are integers between 0 and 255
+	* representing the red, green, and blue components of the color. This is also treated as a new line.
+	* Color and size changes affect all subsequent text until changed again and can only affect entire lines.
+	* @param bgColor The background color of the text texture. Default is transparent.
+	* @return A pointer to the created SDL_Texture. IMPORTANT: Unlike the other textures managed by the ResourceManager,
+	* the caller is responsible for freeing this texture using SDL_DestroyTexture when it is no longer needed.
+	*/
+	TextSprite* createTextSprite(const std::string& text, const SDL_Color& bgColor={0x00,0x00,0x00,0x00});
+
 private:
-	static Utils::RGB COLOR_KEY;
+	static const std::string ASSET_PATH;
+	static const Utils::RGB COLOR_KEY;
 
 	SDL_Renderer* _renderer;
-	std::map<std::string, TextureData> _objectTextures;
+	std::map<std::string, ObjectTextureData> _objectTextures;
 	std::map<std::string, SDL_Texture*> _simpleTextures;
+	std::map<std::string, int> _itemSpriteIds;
+
+	std::string _fontPath;
+	std::map<float, TTF_Font*> _fonts;
+
+	SDL_Texture* create404Texture();
+	void loadItemSpriteIds();
 
 	SDL_Texture* loadTexture(const std::string& textureName);
-	bool loadTextureData(const std::string& textureName, TextureData& textureData);
+	bool loadTextureData(const std::string& textureName, ObjectTextureData& textureData);
+	TTF_Font* getFont(float fontSize);
 };
 

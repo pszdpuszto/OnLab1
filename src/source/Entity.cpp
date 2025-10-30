@@ -8,7 +8,7 @@ Entity::Entity(const std::string& textureName, float x, float y, float w, float 
 
 void Entity::render() const
 {
-	_sprite->render(_rect, _moveRight ? SDL_FLIP_NONE : SDL_FLIP_HORIZONTAL);
+	_sprite.render(_rect, _moveRight ? SDL_FLIP_NONE : SDL_FLIP_HORIZONTAL);
 }
 
 void Entity::move(float a, float speedModifier)
@@ -26,7 +26,7 @@ void Entity::move(float a, float speedModifier)
 	if (_rect.x + _rect.w > WINDOW_WIDTH - ROOM_WALL_THICKNESS) _rect.x = WINDOW_WIDTH - ROOM_WALL_THICKNESS - _rect.w;
 	if (_rect.y + _rect.h > WINDOW_HEIGHT - ROOM_WALL_THICKNESS) _rect.y = WINDOW_HEIGHT - ROOM_WALL_THICKNESS - _rect.h;
 
-	for (Object* obj : Game::getInstance()->getCurrentLevel()->getCurrentRoom()->getObjects()) {
+	for (Object* obj : GAME->getCurrentLevel()->getCurrentRoom()->getObjects()) {
 		if (this->isCollidingWith(obj)) {
 			handleCollision(obj);
 

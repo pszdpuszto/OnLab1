@@ -1,7 +1,5 @@
 #pragma once
 
-//#define MIN (x, y) ((x) < (y) ? (x) : (y))
-
 namespace Utils {
 
 	struct RGB {
@@ -14,7 +12,6 @@ namespace Utils {
 		int x;
 		int y;
 	};
-
 	struct floatPoint {
 		float x;
 		float y;
@@ -41,4 +38,9 @@ namespace Utils {
 			rect2.x, rect2.y, rect2.w, rect2.h);
 	}
 
+	static inline void destroyTexture(SDL_Texture* _texture) {
+		if (_texture != nullptr && SDL_WasInit(SDL_INIT_VIDEO)) {
+			SDL_DestroyTexture(_texture);
+		}
+	}
 };

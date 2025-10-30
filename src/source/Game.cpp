@@ -2,6 +2,8 @@
 
 #include "../header/testLevel.hpp"
 
+#include <iostream>
+
 Game* Game::createInstance(SDL_Window* window) {
 	if (_instance != nullptr) {
 		delete _instance;
@@ -27,12 +29,16 @@ Game::Game(SDL_Window* window)
 	_currentLevel{ nullptr }
 {
 	_renderer = SDL_CreateRenderer(_window, NULL);
+	SDL_SetRenderDrawBlendMode(_renderer, SDL_BLENDMODE_BLEND);
 	SDL_SetRenderLogicalPresentation(_renderer,
 		Consts::WINDOW_WIDTH,
 		Consts::WINDOW_HEIGHT,
 		SDL_RendererLogicalPresentation::SDL_LOGICAL_PRESENTATION_LETTERBOX
 	);
-	_resourceManager = new ResourceManager(_renderer);
+	_resourceManager = new ResourceManager(_renderer, "font");
+	initSprites();
+
+	SDL_HideCursor();
 }
 
 Game::~Game()
@@ -40,7 +46,14 @@ Game::~Game()
 	delete _currentLevel;
 	delete _player;
 
+	for (int i = 0; i < CursorType_SIZE; ++i) {
+		delete _cursorSprite[i];
+	}
+	delete _bgSprite;
+	delete _resourceManager;
+
 	SDL_DestroyRenderer(_renderer);
+	SDL_ShowCursor();
 }
 
 Level* Game::getCurrentLevel() const {
@@ -52,16 +65,72 @@ Utils::WASDState Game::getWASDState() const
 	return _wasdState;
 }
 
-ObjectSprite* Game::createObjectSprite(const std::string& textureName) const
+Utils::floatPoint Game::getMousePosition() const
 {
-	ResourceManager::TextureData textureData = _resourceManager->getObjectTextureData(textureName);
-	return new ObjectSprite(_renderer, textureData.texture, textureData.width, textureData.height, textureData.frameCount);
+	return _mousePosition;
+}
+
+Object::Sprite Game::createObjectSprite(const std::string& textureName) const
+{
+	ResourceManager::ObjectTextureData textureData = _resourceManager->getObjectTextureData(textureName);
+	return Object::Sprite{
+		_renderer, 
+		textureData._texture, 
+		textureData.width, 
+		textureData.height, 
+		textureData.frameCount
+	};
+}
+
+Item::Sprite Game::createItemSprite(const std::string& name) const
+{
+	return Item::Sprite{
+		_renderer,
+		_resourceManager->getTexture("items"),
+		_resourceManager->getItemSpriteSrcRect(name)
+	};
+}
+
+ResourceManager::StaticSprite* Game::createStaticSprite(const std::string& textureName, const SDL_FRect& destRect) const
+{
+	return new ResourceManager::StaticSprite{
+		_renderer,
+		_resourceManager->getTexture(textureName),
+		destRect
+	};
+}
+
+ResourceManager::TextSprite* Game::createTextSprite(const std::string& text, const SDL_Color& bgColor) const
+{
+	return _resourceManager->createTextSprite(text, bgColor);
+}
+
+void Game::renderFullRect(const SDL_FRect& rect, const Utils::RGB& color) const
+{
+	SDL_SetRenderDrawColor(_renderer, color.r, color.g, color.b, 255);
+	SDL_RenderFillRect(_renderer, &rect);
 }
 
 void Game::renderRect(const SDL_FRect& rect, const Utils::RGB& color) const
 {
 	SDL_SetRenderDrawColor(_renderer, color.r, color.g, color.b, 255);
-	SDL_RenderFillRect(_renderer, &rect);
+	SDL_RenderRect(_renderer, &rect);
+}
+
+void Game::dimScreen(float intensity) const
+{
+	SDL_SetRenderDrawColor(_renderer, 0x00, 0x00, 0x00, static_cast<Uint8>(0xff * intensity));
+	SDL_RenderFillRect(_renderer, nullptr);
+}
+
+
+bool Game::isMouseInRect(const SDL_FRect& rect)
+{
+	Utils::floatPoint mousePos = getMousePosition();
+	return Utils::isColliding(
+		mousePos.x, mousePos.y, 0.f, 0.f,
+		rect.x, rect.y, rect.w, rect.h
+	);
 }
 
 void Game::startGameLoop()
@@ -76,7 +145,7 @@ void Game::startGameLoop()
 		Uint64 elapsedTick = SDL_GetTicks() - currentTick;
 		const static Uint64 targetFrameTick = 1000 / Consts::TARGET_FPS;
 		if (elapsedTick < targetFrameTick) {
-			Uint64 delayTick = targetFrameTick - elapsedTick;
+			Uint32 delayTick = static_cast<Uint32>(targetFrameTick - elapsedTick);
 			SDL_Delay(delayTick); // cap at target FPS
 		}
 	}
@@ -84,6 +153,22 @@ void Game::startGameLoop()
 }
 
 Game* Game::_instance = nullptr;
+
+void Game::initSprites()
+{
+	_cursorSprite[POINT] = createStaticSprite("cursorpoint", { 0.f, 0.f, 9.f, 9.f });
+	_cursorSprite[AIM] = createStaticSprite("cursoraim", { 0.f, 0.f, 9.f, 9.f });
+	_bgSprite = createStaticSprite("bg", { 0.f, 0.f, Consts::WINDOW_WIDTH, Consts::WINDOW_HEIGHT });
+}
+
+void Game::setMousePosition(float x, float y)
+{
+	int winW, winH;
+	SDL_GetWindowSize(_window, &winW, &winH);
+	x *= (static_cast<float>(Consts::WINDOW_WIDTH) / static_cast<float>(winW));
+	y *= (static_cast<float>(Consts::WINDOW_HEIGHT) / static_cast<float>(winH));
+	_mousePosition = { x, y };
+}
 
 void Game::tick()
 {
@@ -113,6 +198,8 @@ void Game::handleEvents()
 			break;
 		case SDL_EVENT_KEY_UP:
 			switch (event.key.key) {
+			case SDLK_ESCAPE: _isRunning = false; break;
+
 			case SDLK_W: _wasdState &= ~WASD::W; break;
 			case SDLK_S: _wasdState &= ~WASD::S; break;
 			case SDLK_A: _wasdState &= ~WASD::A; break;
@@ -125,8 +212,21 @@ void Game::handleEvents()
 				SDL_SetWindowFullscreen(_window, SDL_WINDOW_FULLSCREEN);
 				}
 				break;
+
+			case SDLK_E:
+				_player->openInventory();
+				break;
 			default: break;
 			}
+			break;
+		case SDL_EVENT_MOUSE_MOTION:
+			setMousePosition(event.motion.x, event.motion.y);
+			break;
+		case SDL_EVENT_MOUSE_BUTTON_DOWN:
+			_player->mouseDown();
+			break;
+		case SDL_EVENT_MOUSE_BUTTON_UP:
+			_player->mouseUp();
 			break;
 		default:
 			break;
@@ -136,21 +236,43 @@ void Game::handleEvents()
 
 void Game::update()
 {
-	_currentLevel->getCurrentRoom()->update();
-	_player->update();
+	if (!_player->getInvState()) {
+		_currentLevel->getCurrentRoom()->update();
+		_player->update();
+	}
 }
 
 void Game::render()
 {
+	/* CLEAR SCREEN */
 	SDL_SetRenderDrawColor(_renderer, 0, 0, 0, 255);
 	SDL_RenderClear(_renderer);
-	SDL_FRect bg = { 0, 0, Consts::WINDOW_WIDTH, Consts::WINDOW_HEIGHT };
-	SDL_RenderTexture(_renderer, _resourceManager->getSimpleTexture("bg"), nullptr, &bg);
 
+	/* BACKGROUND */
+	_bgSprite->render();
+
+	/* OBJECTS */
 	_currentLevel->getCurrentRoom()->render();
+
+	/* PLAYER & HUD */
 	_player->render();
 
-	SDL_RenderPresent(_renderer);
+	/* INVENTORY */
+	_player->renderInv();
 
+	/* CURSOR */
+	Utils::floatPoint mousePos = getMousePosition();
+	_cursorSprite[POINT]->setPos(mousePos.x, mousePos.y);
+	_cursorSprite[AIM]->setPos(mousePos.x-4.5f, mousePos.y-4.5f);
+
+	if (_player->getInvState()) {
+		_cursorSprite[POINT]->render();
+	}
+	else {
+		_cursorSprite[AIM]->render();
+	}
+
+	/* PRESENT FRAME */
+	SDL_RenderPresent(_renderer);
 }
 

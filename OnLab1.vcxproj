@@ -110,7 +110,7 @@
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>D:\Files\SDL\lib\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>SDL3.lib;SDL3_test.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>SDL3.lib;SDL3_test.lib;SDL3_ttf.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -133,17 +133,19 @@
     <Image Include="Assets\bg.png" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="resource.h" />
     <ClInclude Include="src\header\Application.hpp" />
     <ClInclude Include="src\header\Consts.hpp" />
     <ClInclude Include="src\header\Entity.hpp" />
     <ClInclude Include="src\header\Game.hpp" />
+    <ClInclude Include="src\header\Item.hpp" />
     <ClInclude Include="src\header\Level.hpp" />
     <ClInclude Include="src\header\Object.hpp" />
-    <ClInclude Include="src\header\ObjectSprite.hpp" />
     <ClInclude Include="src\header\Obstacles.hpp" />
     <ClInclude Include="src\header\Player.hpp" />
     <ClInclude Include="src\header\ResourceManager.hpp" />
     <ClInclude Include="src\header\Room.hpp" />
+    <ClInclude Include="src\header\TestItem.hpp" />
     <ClInclude Include="src\header\TestLevel.hpp" />
     <ClInclude Include="src\header\TestRoom.hpp" />
     <ClInclude Include="src\header\Utils.hpp" />
@@ -152,15 +154,19 @@
     <ClCompile Include="src\source\Application.cpp" />
     <ClCompile Include="src\source\Entity.cpp" />
     <ClCompile Include="src\source\Game.cpp" />
+    <ClCompile Include="src\source\Item.cpp" />
     <ClCompile Include="src\source\Level.cpp" />
     <ClCompile Include="src\source\main.cpp" />
     <ClCompile Include="src\source\Object.cpp" />
-    <ClCompile Include="src\source\ObjectSprite.cpp" />
     <ClCompile Include="src\source\Player.cpp" />
     <ClCompile Include="src\source\ResourceManager.cpp" />
     <ClCompile Include="src\source\Room.cpp" />
+    <ClCompile Include="src\source\TestItem.cpp" />
     <ClCompile Include="src\source\TestLevel.cpp" />
     <ClCompile Include="src\source\TestRoom.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="OnLab1.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
