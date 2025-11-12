@@ -26,6 +26,7 @@ public:
 		StaticSprite(SDL_Renderer* renderer, SDL_Texture* texture, const SDL_FRect& destRect);
 
 		void setPos(float x, float y);
+		void setPos(SDL_FPoint point);
 
 		void render() const;
 	protected:
@@ -51,6 +52,7 @@ public:
 	const ObjectTextureData& getObjectTextureData(const std::string& textureName);
 	SDL_Texture* getTexture(const std::string& textureName);
 	SDL_FRect getItemSpriteSrcRect(const std::string& itemName);
+	SDL_FRect getWeaponSpriteSrcRect(const std::string& weaponName, float width, float height);
 
 	/**
 	* Creates an SDL_Texture from a string using the game's font.
@@ -74,12 +76,14 @@ private:
 	std::map<std::string, ObjectTextureData> _objectTextures;
 	std::map<std::string, SDL_Texture*> _simpleTextures;
 	std::map<std::string, int> _itemSpriteIds;
+	std::map<std::string, int> _weaponSpriteIds;
 
 	std::string _fontPath;
 	std::map<float, TTF_Font*> _fonts;
 
 	SDL_Texture* create404Texture();
 	void loadItemSpriteIds();
+	void loadWeaponSpriteIds();
 
 	SDL_Texture* loadTexture(const std::string& textureName);
 	bool loadTextureData(const std::string& textureName, ObjectTextureData& textureData);

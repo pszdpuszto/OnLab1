@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Consts.hpp"
+
 namespace Utils {
 
 	struct RGB {
@@ -42,5 +44,13 @@ namespace Utils {
 		if (_texture != nullptr && SDL_WasInit(SDL_INIT_VIDEO)) {
 			SDL_DestroyTexture(_texture);
 		}
+	}
+
+	static float RadToDeg(float rad) {
+		return rad / Consts::PI * 180.f;
+	}
+
+	static float DegToRad(float deg) {
+		return deg / 180.f * Consts::PI;
 	}
 };

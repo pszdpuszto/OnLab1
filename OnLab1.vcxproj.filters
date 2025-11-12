@@ -110,8 +110,8 @@
     <ClInclude Include="resource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\header\TestItem.hpp">
-      <Filter>Header Files\item</Filter>
+    <ClInclude Include="src\header\Projectile.hpp">
+      <Filter>Header Files\object\entity</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -151,8 +151,8 @@
     <ClCompile Include="src\source\Item.cpp">
       <Filter>Source Files\item</Filter>
     </ClCompile>
-    <ClCompile Include="src\source\TestItem.cpp">
-      <Filter>Source Files\item</Filter>
+    <ClCompile Include="src\header\Projectile.cpp">
+      <Filter>Source Files\object\entity</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

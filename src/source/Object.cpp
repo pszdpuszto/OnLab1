@@ -45,6 +45,9 @@ void Object::Sprite::update()
 
 void Object::Sprite::render(const SDL_FRect& _destRect, SDL_FlipMode mirror, double rotation) const
 {
+#ifdef DEBUG_HITBOX
+	GAME->renderRect(_destRect, { 255,0,0 });
+#endif
 	SDL_RenderTextureRotated(_renderer, _texture, &_srcRect, &_destRect, rotation, nullptr, mirror);
 }
 
@@ -64,7 +67,7 @@ bool Object::update()
 	return false;
 }
 
-void Object::render() const
+void Object::render()
 {
 	_sprite.render(_rect);
 }

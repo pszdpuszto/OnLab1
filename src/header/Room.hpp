@@ -14,10 +14,11 @@ public:
 		return _objects; 
 	};
 
+	void addObject(Object* obj);
+
 	void update();
 	void render() const;
 
 protected:
 	std::vector<Object*> _objects = std::vector<Object*>();
-	std::vector<Entity*> _entities = std::vector<Entity*>();
 };

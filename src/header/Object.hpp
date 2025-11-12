@@ -4,6 +4,8 @@
 #include <map>
 #include <vector>
 
+#include <iostream>
+
 class Object {
 public:
 	class Sprite {
@@ -30,11 +32,17 @@ public:
 	Object(const Object& other) = delete;
 	Object operator=(const Object& other) = delete;
 
+	~Object() { std::cout << "imded\n"; }
+
 	SDL_FRect getRect() const;
 
 	virtual bool update();
-	virtual void render() const;
+	virtual void render();
 
+	enum ObjectTypes {
+		OBJECT, ENTITY, PLAYER, ENEMY, PROJECTILE
+	};
+	virtual ObjectTypes getType() { return OBJECT; }
 protected:
 
 	SDL_FRect _rect;

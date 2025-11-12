@@ -6,7 +6,7 @@
 Entity::Entity(const std::string& textureName, float x, float y, float w, float h, float speed)
 	: Object(textureName, x, y, w, h), _speed(speed* Consts::GLOBAL_SPEED), _moveRight{ false }, _prevPos{x ,y} { }
 
-void Entity::render() const
+void Entity::render()
 {
 	_sprite.render(_rect, _moveRight ? SDL_FLIP_NONE : SDL_FLIP_HORIZONTAL);
 }
@@ -21,12 +21,26 @@ void Entity::move(float a, float speedModifier)
 	_rect.x += sinf(a) * _speed * speedModifier;
 	_rect.y += cosf(a) * _speed * speedModifier;
 
-	if (_rect.x < ROOM_WALL_THICKNESS) _rect.x = ROOM_WALL_THICKNESS;
-	if (_rect.y < ROOM_WALL_THICKNESS) _rect.y = ROOM_WALL_THICKNESS;
-	if (_rect.x + _rect.w > WINDOW_WIDTH - ROOM_WALL_THICKNESS) _rect.x = WINDOW_WIDTH - ROOM_WALL_THICKNESS - _rect.w;
-	if (_rect.y + _rect.h > WINDOW_HEIGHT - ROOM_WALL_THICKNESS) _rect.y = WINDOW_HEIGHT - ROOM_WALL_THICKNESS - _rect.h;
+	if (_rect.x < ROOM_WALL_THICKNESS) {
+		_rect.x = ROOM_WALL_THICKNESS;
+		handleCollision(nullptr);
+	}
+	if (_rect.y < ROOM_WALL_THICKNESS) {
+		handleCollision(nullptr);
+		_rect.y = ROOM_WALL_THICKNESS;
+	}
+	if (_rect.x + _rect.w > WINDOW_WIDTH - ROOM_WALL_THICKNESS) {
+		handleCollision(nullptr);
+		_rect.x = WINDOW_WIDTH - ROOM_WALL_THICKNESS - _rect.w;
+	}
+	if (_rect.y + _rect.h > WINDOW_HEIGHT - ROOM_WALL_THICKNESS) {
+		handleCollision(nullptr);
+		_rect.y = WINDOW_HEIGHT - ROOM_WALL_THICKNESS - _rect.h;
+	}
 
 	for (Object* obj : GAME->getCurrentLevel()->getCurrentRoom()->getObjects()) {
+		if (this == obj)
+			continue;
 		if (this->isCollidingWith(obj)) {
 			handleCollision(obj);
 
@@ -39,7 +53,8 @@ void Entity::move(float a, float speedModifier)
 
 void Entity::handleCollision(Object* collidedWith)
 {
-	calcPosAfterCollision(collidedWith->getRect());
+	if (collidedWith)
+		calcPosAfterCollision(collidedWith->getRect());
 }
 
 void Entity::calcPosAfterCollision(SDL_FRect other)

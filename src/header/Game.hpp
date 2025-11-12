@@ -13,6 +13,8 @@
 
 #define GAME Game::getInstance()
 
+#define DEBUG_HITBOX
+
 class Game {
 public:
 	static Game* createInstance(SDL_Window* window);
@@ -23,6 +25,7 @@ public:
 	~Game();
 
 	Level* getCurrentLevel() const;
+	Player* getPlayer() const;
 	Utils::WASDState getWASDState() const;
 	Utils::floatPoint getMousePosition() const;
 
@@ -30,12 +33,14 @@ public:
 	ResourceManager::TextSprite* createTextSprite(const std::string& text, const SDL_Color& bgColor={0x00,0x00,0x00,0x00}) const;
 	Object::Sprite createObjectSprite(const std::string& textureName) const;
 	Item::Sprite createItemSprite(const std::string& name) const;
+	Weapon::Sprite createWeaponSprite(const std::string& name, float width, float height, float animationLength);
+	SDL_Texture* getMuzzleTexture(); // TODO better
 
 	void renderFullRect(const SDL_FRect& rect, const Utils::RGB& color) const;
 	void renderRect(const SDL_FRect& rect, const Utils::RGB& color) const;
 	void dimScreen(float intensity) const;
 
-	bool isMouseInRect(const SDL_FRect& rect);
+	bool isMouseInRect(const SDL_FRect& rect) const;
 
 	void startGameLoop();
 private:

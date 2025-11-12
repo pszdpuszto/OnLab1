@@ -60,6 +60,11 @@ Level* Game::getCurrentLevel() const {
 	return _currentLevel;
 }
 
+Player* Game::getPlayer() const
+{
+	return _player;
+}
+
 Utils::WASDState Game::getWASDState() const
 {
 	return _wasdState;
@@ -89,6 +94,21 @@ Item::Sprite Game::createItemSprite(const std::string& name) const
 		_resourceManager->getTexture("items"),
 		_resourceManager->getItemSpriteSrcRect(name)
 	};
+}
+
+Weapon::Sprite Game::createWeaponSprite(const std::string& name, float width, float height, float animationLength)
+{
+	return Weapon::Sprite{
+		_renderer,
+		_resourceManager->getTexture("weapons"),
+		_resourceManager->getWeaponSpriteSrcRect(name, width, height),
+		animationLength
+	};
+}
+
+SDL_Texture* Game::getMuzzleTexture()
+{
+	return _resourceManager->getTexture("muzzleFlash");
 }
 
 ResourceManager::StaticSprite* Game::createStaticSprite(const std::string& textureName, const SDL_FRect& destRect) const
@@ -124,7 +144,7 @@ void Game::dimScreen(float intensity) const
 }
 
 
-bool Game::isMouseInRect(const SDL_FRect& rect)
+bool Game::isMouseInRect(const SDL_FRect& rect) const
 {
 	Utils::floatPoint mousePos = getMousePosition();
 	return Utils::isColliding(
@@ -215,6 +235,10 @@ void Game::handleEvents()
 
 			case SDLK_E:
 				_player->openInventory();
+				break;
+
+			case SDLK_R:
+				_player->useRing();
 				break;
 			default: break;
 			}

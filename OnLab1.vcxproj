@@ -105,6 +105,7 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>D:\Files\SDL\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -143,14 +144,15 @@
     <ClInclude Include="src\header\Object.hpp" />
     <ClInclude Include="src\header\Obstacles.hpp" />
     <ClInclude Include="src\header\Player.hpp" />
+    <ClInclude Include="src\header\Projectile.hpp" />
     <ClInclude Include="src\header\ResourceManager.hpp" />
     <ClInclude Include="src\header\Room.hpp" />
-    <ClInclude Include="src\header\TestItem.hpp" />
     <ClInclude Include="src\header\TestLevel.hpp" />
     <ClInclude Include="src\header\TestRoom.hpp" />
     <ClInclude Include="src\header\Utils.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\header\Projectile.cpp" />
     <ClCompile Include="src\source\Application.cpp" />
     <ClCompile Include="src\source\Entity.cpp" />
     <ClCompile Include="src\source\Game.cpp" />
@@ -161,7 +163,6 @@
     <ClCompile Include="src\source\Player.cpp" />
     <ClCompile Include="src\source\ResourceManager.cpp" />
     <ClCompile Include="src\source\Room.cpp" />
-    <ClCompile Include="src\source\TestItem.cpp" />
     <ClCompile Include="src\source\TestLevel.cpp" />
     <ClCompile Include="src\source\TestRoom.cpp" />
   </ItemGroup>

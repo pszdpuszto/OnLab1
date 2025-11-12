@@ -9,15 +9,23 @@ Room::~Room()
 	for (Object* obj : _objects) {
 		delete obj;
 	}
-	for (Entity* ent : _entities) {
-		delete ent;
-	}
+}
+
+void Room::addObject(Object* obj)
+{
+	_objects.push_back(obj);
 }
 
 void Room::update()
 {
-	for (Entity* ent : _entities) {
-		ent->update();
+	for (int i = 0; i < _objects.size();) {
+		if (_objects[i]->update()) {
+			delete _objects[i];
+			_objects.erase(std::next(_objects.begin(), i));
+		}
+		else {
+			i++;
+		}
 	}
 }
 

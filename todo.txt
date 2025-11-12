@@ -1,0 +1,2 @@
+Ring and weapon destructor error :(
+replace intPoint and floatpoint with SDL_Point and SDL_FPoint

@@ -14,6 +14,7 @@ ResourceManager::ResourceManager(SDL_Renderer* renderer, const std::string& font
 
 	_simpleTextures["404"] = create404Texture();
 	loadItemSpriteIds();
+	loadWeaponSpriteIds();
 };
 
 ResourceManager::~ResourceManager()
@@ -73,6 +74,19 @@ SDL_FRect ResourceManager::getItemSpriteSrcRect(const std::string& itemName)
 		static_cast<float>((spriteId / cols) * 16),
 		16.f,
 		16.f
+	};
+}
+
+SDL_FRect ResourceManager::getWeaponSpriteSrcRect(const std::string& weaponName, float width, float height)
+{
+	if (_weaponSpriteIds.size() == 0)
+		return { 0.f };
+	SDL_Texture* weaponsTexture = getTexture("weapons");
+	int rowHeight = weaponsTexture->h / static_cast<int>(_weaponSpriteIds.size());
+	int id = _weaponSpriteIds[weaponName];
+	return {
+		0.f, static_cast<float>(rowHeight) * id,
+		width, height
 	};
 }
 
@@ -174,7 +188,7 @@ void ResourceManager::loadItemSpriteIds()
 {
 	std::ifstream file{ ASSET_PATH + "items.fdf" };
 	if (!file.is_open()) {
-		SDL_Log("Failed to open item_sprites.ids: %s", SDL_GetError());
+		SDL_Log("Failed to open items.fdf: %s", SDL_GetError());
 		return;
 	}
 	/**
@@ -188,6 +202,27 @@ void ResourceManager::loadItemSpriteIds()
 	int id = 0;
 	while (std::getline(file, name)) {
 		_itemSpriteIds[name] = id++;
+	}
+}
+
+void ResourceManager::loadWeaponSpriteIds()
+{
+	std::ifstream file{ ASSET_PATH + "weapons.fdf" };
+	if (!file.is_open()) {
+		SDL_Log("Failed to open weapons.fdf: %s", SDL_GetError());
+		return;
+	}
+	/**
+	* File format:
+	* <weapon_name_id_0>
+	* <weapon_name_id_1>
+	* ...
+	* <weapon_name_id_n>
+	*/
+	std::string name;
+	int id = 0;
+	while (std::getline(file, name)) {
+		_weaponSpriteIds[name] = id++;
 	}
 }
 
@@ -263,6 +298,11 @@ void ResourceManager::StaticSprite::setPos(float x, float y)
 {
 	_destRect.x = x;
 	_destRect.y = y;
+}
+
+void ResourceManager::StaticSprite::setPos(SDL_FPoint point)
+{
+	setPos(point.x, point.y);
 }
 
 void ResourceManager::StaticSprite::render() const

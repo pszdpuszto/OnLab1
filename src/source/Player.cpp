@@ -4,13 +4,14 @@
 
 #include "../header/Game.hpp"
 #include "../header/Consts.hpp"
-#include "../header/TestItem.hpp"
+#include "../header/Projectile.hpp"
 
 Player::Player()
 	: Entity("player", Consts::ROOM_RECT.w / 2.f - 8.f, Consts::ROOM_RECT.h / 2.f - 10.f, 16.f, 21.f, 1.f * Consts::GLOBAL_SPEED),
-	_invMgr{ this, &_statsSprite } {
-	_health = _stats[Stats::HP];
-	_statsSprite = createStatsSprite();
+	_statsSprite{ createStatsSprite() },
+	_invMgr{ this, &_statsSprite }
+	 {
+	_health = _stats[Stats::HP] / 2.f;
 }
 
 Player::~Player()
@@ -23,8 +24,22 @@ int Player::getInvState() const
 	return _invState;
 }
 
+Player::LookData Player::getLookData()
+{
+	Utils::floatPoint mousePos = GAME->getMousePosition();
+	float a = atan2f(_rect.x + _rect.w / 2 - mousePos.x, _rect.y + _rect.h / 2 - mousePos.y) + Consts::PI;
+	float x = _rect.x + _rect.w / 2 + (_rect.h / 2 * sin(a));
+	float y = _rect.y + _rect.h / 2 + (_rect.h / 2 * cos(a));
+
+	return {
+		{ x, y },
+		a
+	};
+}
+
 void Player::openInventory()
 {
+	_invMgr.setAttack(false);
 	if (_invState == INVENTORY)
 		_invState = CLOSED;
 	else
@@ -34,7 +49,7 @@ void Player::openInventory()
 void Player::mouseDown()
 {
 	if (_invState == CLOSED) {
-
+		_invMgr.setAttack(true);
 	}
 	else {
 		_invMgr.mouseDown();
@@ -44,7 +59,7 @@ void Player::mouseDown()
 void Player::mouseUp()
 {
 	if (_invState == CLOSED) {
-
+		_invMgr.setAttack(false);
 	}
 	else {
 		_invMgr.mouseUp();
@@ -54,12 +69,21 @@ void Player::mouseUp()
 bool Player::update()
 {
 	pMove();
+
+	_invMgr.update();
+
 	return Object::update();
 }
 
-void Player::render() const
+void Player::render()
 {
-	Entity::render();
+#ifdef DEBUG_HITBOX
+	GAME->renderRect(_rect, { 255,0,0 });
+#endif
+	_sprite.render(_rect, _rect.x+_rect.w/2 >= GAME->getMousePosition().x ? SDL_FLIP_NONE : SDL_FLIP_HORIZONTAL);
+	Weapon* weapon = static_cast<Weapon*>(_invMgr[Item::WEAPON]);
+	if (weapon)
+		weapon->render();
 	renderHUD();
 }
 
@@ -86,7 +110,17 @@ ResourceManager::TextSprite* Player::createStatsSprite()
 		Stats::Stat stat = static_cast<Stats::Stat>(i);
 		oss << Stats::statToString(stat) << ": " << _stats[stat] << "$N$";
 	}
-	return GAME->createTextSprite(oss.str());
+	auto statSprite = GAME->createTextSprite(oss.str());
+	statSprite->setPos(_invMgr.getStatPoint());
+
+	return statSprite;
+}
+
+void Player::useRing()
+{
+	Ring* ring = static_cast<Ring*>(_invMgr[Item::RING]);
+	if (ring)
+		ring->use();
 }
 
 void Player::equipmentChange(bool equip, Item* item)
@@ -101,6 +135,13 @@ void Player::equipmentChange(bool equip, Item* item)
 	}
 	delete _statsSprite;
 	_statsSprite = createStatsSprite();
+}
+
+void Player::heal(float amount)
+{
+	_health += amount;
+	if (_health > _stats[Stats::HP])
+		_health = _stats[Stats::HP];
 }
 
 void Player::pMove()
@@ -129,12 +170,20 @@ void Player::pMove()
 	);
 }
 
-void Player::renderHUD() const
+void Player::renderHUD()
 {
 	static const SDL_FRect barBack{
 		4.f, 4.f,
 		200.f, 9.f
 	};
+
+	Ring* ring = static_cast<Ring*>(_invMgr[Item::RING]);
+	if (ring)
+		ring->renderCooldown({ barBack.x, barBack.y - 1, barBack.w, barBack.h });
+	Weapon* weapon = static_cast<Weapon*>(_invMgr[Item::WEAPON]);
+	if (weapon)
+		weapon->renderCooldown({ barBack.x, barBack.y + 1, barBack.w, barBack.h });
+
 	Game* game = GAME;
 	SDL_FRect healthBarFront{
 		barBack.x + 1.f, barBack.y + 1.f,
@@ -204,13 +253,21 @@ Player::InventoryManager::InventoryManager(Player* player, ResourceManager::Text
 		};
 	}
 
-	_inv[0]->swapItem(new RubyHealingRing);
+	_inv[0]->swapItem(new RubyRing);
 	_inv[1]->swapItem(new LeatherJacket);
 	_inv[2]->swapItem(new VampireAmulet);
-	_inv[3]->swapItem(new CrusaderBoots);
+	//_inv[3]->swapItem(new CrusaderBoots);
 	_inv[4]->swapItem(new BaseballCap);
-	_inv[5]->swapItem(new Broom);
-	_inv[6]->swapItem(new Uzi);
+	_inv[5]->swapItem(new Club);
+	_inv[6]->swapItem(new Broom);
+	_inv[7]->swapItem(new Dagger);
+	_inv[8]->swapItem(new Sword);
+	_inv[9]->swapItem(new Pistol);
+	_inv[10]->swapItem(new Uzi);
+	_inv[11]->swapItem(new Shotgun);
+	_inv[3]->swapItem(new Sniper);
+
+
 
 	for (int i = 0; i < Item::Type_SIZE; i++) {
 		const Item::Type type = static_cast<Item::Type>(i);
@@ -233,6 +290,16 @@ Player::InventoryManager::~InventoryManager()
 			delete _inv[i];
 		}
 	}
+}
+
+Item* Player::InventoryManager::operator[](Item::Type type)
+{
+	return _equippedItems[type]->getItem();
+}
+
+SDL_FPoint Player::InventoryManager::getStatPoint()
+{
+	return { STAT_POS.x, STAT_POS.y + 2.f };
 }
 
 void Player::InventoryManager::mouseDown()
@@ -258,11 +325,24 @@ void Player::InventoryManager::mouseUp()
 	}
 }
 
+void Player::InventoryManager::setAttack(bool attack)
+{
+	_attack = attack;
+}
+
+void Player::InventoryManager::update()
+{
+	if (_equippedItems[Item::RING]->getItem())
+		static_cast<Ring*>(_equippedItems[Item::RING]->getItem())->update();
+
+	if (_equippedItems[Item::WEAPON]->getItem())
+		static_cast<Weapon*>(_equippedItems[Item::WEAPON]->getItem())->update(_attack);
+}
+
 void Player::InventoryManager::render() const
 {
 	/* UI */
 	_invSprite->render();
-	(*_statsSprite)->setPos(STAT_POS.x, STAT_POS.y+ 2.f); //!!! TODO: better
 	(*_statsSprite)->render();
 
 	/* Equipped items */

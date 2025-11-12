@@ -13,16 +13,23 @@ public:
 	~Player();
 
 	int getInvState() const;
+	struct LookData { SDL_FPoint from; float a; } getLookData();
 
 	void openInventory();
 	void mouseDown();
 	void mouseUp();
 
 	bool update() override;
-	void render() const override;
+	void render() override;
 	void renderInv() const;
 
+	void useRing();
+
 	void equipmentChange(bool equip, Item* item);
+
+	void heal(float amount);
+
+	ObjectTypes getType() override { return PLAYER; }
 private:
 	class InventoryManager {
 	public:
@@ -31,9 +38,16 @@ private:
 		InventoryManager operator=(const InventoryManager& other) = delete;
 		~InventoryManager();
 
+		Item* operator[](Item::Type);
+
+		SDL_FPoint getStatPoint();
+
 		void mouseDown();
 		void mouseUp();
 
+		void setAttack(bool attack);
+
+		void update();
 		void render() const;
 
 	private:
@@ -44,6 +58,7 @@ private:
 
 			Item* getItem() const;
 			Item* swapItem(Item* item);
+
 
 			void render() const;
 			void renderDescr() const;
@@ -69,6 +84,8 @@ private:
 		Item* _draggedItem = nullptr;
 		ItemSlot* _dragSource = nullptr;
 
+		bool _attack = false;
+
 		void startDrag(ItemSlot* src);
 		void endDrag(ItemSlot* dest);
 
@@ -87,10 +104,6 @@ private:
 
 	float _health;
 
-	InventoryManager _invMgr;
-
-	ResourceManager::TextSprite* _statsSprite;
-
 	Stats::stat_t _stats = {
 		{ Stats::SPD, 1.f },
 		{ Stats::HP, 200.f },
@@ -101,12 +114,16 @@ private:
 		{ Stats::LIFESTEAL, 0.f }
 	};
 
+	InventoryManager _invMgr;
+
+	ResourceManager::TextSprite* _statsSprite;
+
 	ResourceManager::TextSprite* createStatsSprite();
 
 
 	void pMove();
 
-	void renderHUD() const;
+	void renderHUD();
 	void renderInventory() const;
 	void renderSkillTree() const;
 };
