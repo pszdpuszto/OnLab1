@@ -28,6 +28,7 @@ protected:
 	struct PlayerData { float angle; float dist; };
 	PlayerData calcPlayerData() const;
 	virtual void moveLogic() = 0;
+	virtual void deathLogic();
 	float _maxHp, _hp, _dmg;
 private:
 	void renderHpBar() const;
@@ -64,13 +65,14 @@ class SmallSpider : public MeleeEnemy
 public: SmallSpider(float x, float y) : MeleeEnemy{ "smallSpider", x, y, 16.f, 16.f, 50.f, 60.f, 1.5f } {};
 protected:
 	bool update() override;
-	void moveLogic() override;
+	void deathLogic() override;
 	void doAttack(float _=10.f) override;
 private :
 	enum state_t {
 		IDLE = 0,
 		MOVING = 1,
 		EXPLODING = 2,
+		DEAD = 3
 	};
 	bool _dead = false;
 };

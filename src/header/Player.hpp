@@ -27,6 +27,8 @@ public:
 
 	void useRing();
 
+	void pickUpItem();
+
 	void equipmentChange(bool equip, Item* item);
 
 	void heal(float amount);
@@ -40,24 +42,6 @@ protected:
 private:
 	class InventoryManager {
 	public:
-		InventoryManager(Player* player, ResourceManager::TextSprite** statSprite);
-		InventoryManager(const InventoryManager& other) = delete;
-		InventoryManager operator=(const InventoryManager& other) = delete;
-		~InventoryManager();
-
-		Item* operator[](Item::Type);
-
-		SDL_FPoint getStatPoint();
-
-		void mouseDown();
-		void mouseUp();
-
-		void setAttack(bool attack);
-
-		void update();
-		void render() const;
-
-	private:
 		class ItemSlot {
 		public:
 			ItemSlot(const Utils::floatPoint& pos, Player* player = nullptr, std::function<bool(Item*)> filter = [](Item* _) {return true;});
@@ -75,6 +59,27 @@ private:
 			Item* _item;
 			std::function<bool(Item*)> _filter;
 		};
+
+		InventoryManager(Player* player, ResourceManager::TextSprite** statSprite);
+		InventoryManager(const InventoryManager& other) = delete;
+		InventoryManager operator=(const InventoryManager& other) = delete;
+		~InventoryManager();
+
+		Item* operator[](Item::Type);
+
+		SDL_FPoint getStatPoint();
+
+		ItemSlot* getFreeSlot() const;
+
+		void mouseDown();
+		void mouseUp();
+
+		void setAttack(bool attack);
+
+		void update();
+		void render() const;
+
+	private:
 		static constexpr int INV_COLS = 3;
 		static constexpr int INV_ROWS = 4;
 		static const SDL_FRect INV_SPRITE_RECT;

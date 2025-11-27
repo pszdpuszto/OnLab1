@@ -138,6 +138,7 @@
     <ClInclude Include="src\header\Application.hpp" />
     <ClInclude Include="src\header\Consts.hpp" />
     <ClInclude Include="src\header\Door.hpp" />
+    <ClInclude Include="src\header\DroppedItem.hpp" />
     <ClInclude Include="src\header\Enemy.hpp" />
     <ClInclude Include="src\header\Entity.hpp" />
     <ClInclude Include="src\header\Game.hpp" />
@@ -156,6 +157,7 @@
   <ItemGroup>
     <ClCompile Include="src\source\Application.cpp" />
     <ClCompile Include="src\source\Door.cpp" />
+    <ClCompile Include="src\source\DroppedItem.cpp" />
     <ClCompile Include="src\source\Enemy.cpp" />
     <ClCompile Include="src\source\Entity.cpp" />
     <ClCompile Include="src\source\Game.cpp" />

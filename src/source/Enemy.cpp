@@ -22,6 +22,7 @@ void Enemy::render()
 bool Enemy::update()
 {
 	if (_inv) _inv--;
+	deathLogic();
 	moveLogic();
 	return Object::update();
 }
@@ -50,6 +51,18 @@ Enemy::PlayerData Enemy::calcPlayerData() const
 		atan2f(playerCenter.x - enemyCenter.x, playerCenter.y - enemyCenter.y),
 		dist(playerCenter, enemyCenter)
 	};
+}
+
+void Enemy::deathLogic()
+{
+	if (_sprite.getState() < DIEING && _hp <= 0.f) {
+		_collisionEnabled = false;
+		_sprite.setState(DIEING, [this]() {
+			_sprite.setState(DEAD);
+			GAME->getCurrentLevel()->getCurrentRoom()->enemyDead();
+			});
+		return;
+	}
 }
 
 void Enemy::renderHpBar() const
@@ -90,14 +103,6 @@ void MeleeEnemy::handleCollision(Object* collidedWith)
 
 void MeleeEnemy::moveLogic()
 {
-	if (_sprite.getState() < DIEING && _hp <= 0.f) {
-		_collisionEnabled = false;
-		_sprite.setState(DIEING, [this]() {
-			_sprite.setState(DEAD);
-			GAME->getCurrentLevel()->getCurrentRoom()->enemyDead();
-			});
-		return;
-	}
 	if (_sprite.getState() == MOVING)
 		move(calcPlayerData().angle);
 }
@@ -118,7 +123,7 @@ bool SmallSpider::update()
 	return MeleeEnemy::update();
 }
 
-void SmallSpider::moveLogic()
+void SmallSpider::deathLogic()
 {
 	if (_sprite.getState() < EXPLODING && _hp <= 0.f) {
 		_collisionEnabled = false;
@@ -127,14 +132,12 @@ void SmallSpider::moveLogic()
 			});
 		return;
 	}
-	if (_sprite.getState() == MOVING)
-		move(calcPlayerData().angle);
 }
 
 void SmallSpider::doAttack(float _)
 {
 	MeleeEnemy::doAttack(10.f);
-	_sprite.setState(IDLE);
+	_sprite.setState(DEAD);
 	_dead = true;
 }
 
@@ -203,6 +206,8 @@ void RangedEnemy::doAttack()
 
 void SpiderMother::moveLogic()
 {
+	if (_sprite.getState() >= DIEING)
+		return;
 	if (_count) _count--;
 	else {
 		GAME->getCurrentLevel()->getCurrentRoom()->addObject(new SmallSpider(

@@ -43,6 +43,8 @@ public:
 		TextSprite operator=(const TextSprite& other) = delete;
 		~TextSprite(); // _texture isn't managed by ResourceManager
 
+		SDL_FRect getRect() const;
+
 		void setPosFitToWindow(float x, float y);
 	};
 

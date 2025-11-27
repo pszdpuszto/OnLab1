@@ -15,6 +15,8 @@
 
 #define DEBUG_HITBOX
 
+class DroppedItem;
+
 class Game {
 public:
 	static Game* createInstance(SDL_Window* window);
@@ -30,6 +32,8 @@ public:
 	Utils::floatPoint getMousePosition() const;
 
 	void moveThroughDoor(Door* door);
+	void closestPickupableItemCandidate(DroppedItem* item);
+	DroppedItem* getClosestPickupableItem();
 
 	ResourceManager::StaticSprite* createStaticSprite(const std::string& textureName, const SDL_FRect& destRect) const;
 	ResourceManager::TextSprite* createTextSprite(const std::string& text, const SDL_Color& bgColor={0x00,0x00,0x00,0x00}) const;
@@ -64,6 +68,8 @@ private:
 	Player* _player;
 	Utils::WASDState _wasdState = 0;
 	Utils::floatPoint _mousePosition = { 0.f, 0.f };
+
+	struct { DroppedItem* item; float dist; } _closestDroppedItem = { nullptr, 0.f };
 
 	void initSprites();
 

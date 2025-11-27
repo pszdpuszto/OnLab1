@@ -1,6 +1,7 @@
 #include "../header/game.hpp"
 
 #include "../header/testLevel.hpp"
+#include "../header/DroppedItem.hpp"
 
 #include <iostream>
 
@@ -79,6 +80,28 @@ void Game::moveThroughDoor(Door* door)
 {
 	getCurrentLevel()->moveToRoom(door->getToRoom());
 	_player->moveTo(door->getDoorType());
+}
+
+void Game::closestPickupableItemCandidate(DroppedItem* item)
+{
+	static const float PICKUP_RADIUS = 30.f;
+	SDL_FPoint playerCenter = {
+		_player->getRect().x + _player->getRect().w / 2.f,
+		_player->getRect().y + _player->getRect().h / 2.f
+	};
+	SDL_FPoint itemCenter = {
+		item->getRect().x + item->getRect().w / 2.f,
+		item->getRect().y + item->getRect().h / 2.f
+	};
+	float distance = Utils::dist(playerCenter, itemCenter);
+	if (distance < PICKUP_RADIUS && (!_closestDroppedItem.item || _closestDroppedItem.dist > distance)) {
+		_closestDroppedItem = { item, distance };
+	}
+}
+
+DroppedItem* Game::getClosestPickupableItem()
+{
+	return _closestDroppedItem.item;
 }
 
 Object::Sprite Game::createObjectSprite(const std::string& textureName) const
@@ -249,6 +272,10 @@ void Game::handleEvents()
 				_player->openInventory();
 				break;
 
+			case SDLK_Q:
+				_player->pickUpItem();
+				break;
+
 			case SDLK_R:
 				_player->useRing();
 				break;
@@ -273,6 +300,7 @@ void Game::handleEvents()
 void Game::update()
 {
 	if (!_player->getInvState()) {
+		_closestDroppedItem = { nullptr, 0.f };
 		_currentLevel->getCurrentRoom()->update();
 		_player->update();
 	}

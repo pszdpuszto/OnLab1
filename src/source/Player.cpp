@@ -5,6 +5,7 @@
 #include "../header/Game.hpp"
 #include "../header/Consts.hpp"
 #include "../header/Projectile.hpp"
+#include "../header/DroppedItem.hpp"
 
 Player::Player()
 	: Entity("player", Consts::ROOM_RECT.w / 2.f - 8.f, Consts::ROOM_RECT.h / 2.f - 10.f, 16.f, 21.f, 1.f * Consts::GLOBAL_SPEED),
@@ -121,6 +122,17 @@ void Player::useRing()
 	Ring* ring = static_cast<Ring*>(_invMgr[Item::RING]);
 	if (ring)
 		ring->use();
+}
+
+void Player::pickUpItem()
+{
+	DroppedItem* item = GAME->getClosestPickupableItem();
+	if (item) {
+		InventoryManager::ItemSlot* freeSlot = _invMgr.getFreeSlot();
+		if (freeSlot) {
+			freeSlot->swapItem(item->pickup());
+		}
+	}
 }
 
 void Player::equipmentChange(bool equip, Item* item)
@@ -334,6 +346,16 @@ SDL_FPoint Player::InventoryManager::getStatPoint()
 	return { STAT_POS.x, STAT_POS.y + 2.f };
 }
 
+Player::InventoryManager::ItemSlot* Player::InventoryManager::getFreeSlot() const
+{
+	for (auto i : _inv) {
+		if (i->getItem() == nullptr) {
+			return i;
+		}
+	}
+	return nullptr;
+}
+
 void Player::InventoryManager::mouseDown()
 {
 	if (GAME->isMouseInRect(INV_RECT)) {
@@ -429,8 +451,12 @@ void Player::InventoryManager::endDrag(ItemSlot* dest)
 			_dragSource->swapItem(dest->swapItem(_draggedItem));
 		}
 	}
-	else
+	else if (GAME->isMouseInRect(INV_SPRITE_RECT)) {
 		_dragSource->swapItem(_draggedItem);
+	}
+	else {
+		GAME->getCurrentLevel()->getCurrentRoom()->addObject(new DroppedItem(_draggedItem));
+	}
 
 	_draggedItem = nullptr;
 	_dragSource = nullptr;

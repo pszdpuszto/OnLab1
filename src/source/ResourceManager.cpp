@@ -315,6 +315,11 @@ ResourceManager::TextSprite::~TextSprite()
 	Utils::destroyTexture(_texture);
 }
 
+SDL_FRect ResourceManager::TextSprite::getRect() const
+{
+	return _destRect;
+}
+
 void ResourceManager::TextSprite::setPosFitToWindow(float x, float y)
 {
 	StaticSprite::setPos(x, y);

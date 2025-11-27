@@ -125,6 +125,9 @@
     <ClInclude Include="src\header\Door.hpp">
       <Filter>Header Files\object</Filter>
     </ClInclude>
+    <ClInclude Include="src\header\DroppedItem.hpp">
+      <Filter>Header Files\item</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\source\Application.cpp">
@@ -171,6 +174,9 @@
     </ClCompile>
     <ClCompile Include="src\source\Projectile.cpp">
       <Filter>Source Files\object\entity</Filter>
+    </ClCompile>
+    <ClCompile Include="src\source\DroppedItem.cpp">
+      <Filter>Source Files\item</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

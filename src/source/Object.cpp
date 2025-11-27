@@ -26,6 +26,7 @@ void Object::Sprite::setState(int state, std::function<void(void)> callback)
 	if (_spriteState == state || _frameCount.empty() || _frameCount.size() <= state)
 		return;
 
+	SDL_Log("Setting sprite state to %d", state);
 	_spriteState = state;
 	_count = 0.f;
 	_srcRect.x = 0;
