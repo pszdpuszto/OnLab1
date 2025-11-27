@@ -75,6 +75,12 @@ Utils::floatPoint Game::getMousePosition() const
 	return _mousePosition;
 }
 
+void Game::moveThroughDoor(Door* door)
+{
+	getCurrentLevel()->moveToRoom(door->getToRoom());
+	_player->moveTo(door->getDoorType());
+}
+
 Object::Sprite Game::createObjectSprite(const std::string& textureName) const
 {
 	ResourceManager::ObjectTextureData textureData = _resourceManager->getObjectTextureData(textureName);
@@ -141,6 +147,12 @@ void Game::dimScreen(float intensity) const
 {
 	SDL_SetRenderDrawColor(_renderer, 0x00, 0x00, 0x00, static_cast<Uint8>(0xff * intensity));
 	SDL_RenderFillRect(_renderer, nullptr);
+}
+
+void Game::renderLine(const SDL_FPoint p1, const SDL_FPoint p2, const SDL_Color color) const
+{
+	SDL_SetRenderDrawColor(_renderer, color.r, color.g, color.b, color.a);
+	SDL_RenderLine(_renderer, p1.x, p1.y, p2.x, p2.y);
 }
 
 

@@ -29,6 +29,8 @@ public:
 	Utils::WASDState getWASDState() const;
 	Utils::floatPoint getMousePosition() const;
 
+	void moveThroughDoor(Door* door);
+
 	ResourceManager::StaticSprite* createStaticSprite(const std::string& textureName, const SDL_FRect& destRect) const;
 	ResourceManager::TextSprite* createTextSprite(const std::string& text, const SDL_Color& bgColor={0x00,0x00,0x00,0x00}) const;
 	Object::Sprite createObjectSprite(const std::string& textureName) const;
@@ -39,6 +41,8 @@ public:
 	void renderFullRect(const SDL_FRect& rect, const Utils::RGB& color) const;
 	void renderRect(const SDL_FRect& rect, const Utils::RGB& color) const;
 	void dimScreen(float intensity) const;
+
+	void renderLine(const SDL_FPoint p1, const SDL_FPoint p2, const SDL_Color color) const;
 
 	bool isMouseInRect(const SDL_FRect& rect) const;
 

@@ -102,7 +102,7 @@ public:
 	void use();
 
 	void update();
-	void renderCooldown(SDL_FRect destRect);
+	void renderCooldown(SDL_FRect destRect) const;
 protected:
 	virtual void doUse() = 0;
 private:
@@ -302,7 +302,7 @@ public:
 
 	void update(bool attack);
 	void render();
-	void renderCooldown(SDL_FRect destRect);
+	void renderCooldown(SDL_FRect destRect) const;
 
 protected:
 	float _dmg;
@@ -328,7 +328,10 @@ private:
 		MeleeSprite(Sprite sprite) : Sprite{ sprite } {};
 
 		void render() override;
-		SDL_FRect getHitbox();
+		const SDL_FPoint* getHitbox() const;
+		float getAnimationLength() const;
+	private:
+		SDL_FPoint _hitbox[4] = { 0.f };
 	};
 
 	void doAttack(bool attack) override;
@@ -368,7 +371,7 @@ private:
 		RangedSprite(Sprite sprite);
 
 		void render() override;
-		SDL_FPoint getBulletPoint();
+		SDL_FPoint getBulletPoint() const;
 	private:
 		SDL_FPoint _bulletPoint = { 0.f, 0.f };
 		SDL_Texture* _muzzleFlashTexture;

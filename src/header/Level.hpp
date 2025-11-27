@@ -12,6 +12,9 @@ public:
 	Room* getCurrentRoom() const {
 		return _currentRoom;
 	}
+	void moveToRoom(Room* room) {
+		_currentRoom = room;
+	}
 
 protected:
 	std::vector<Room*> _rooms = std::vector<Room*>();

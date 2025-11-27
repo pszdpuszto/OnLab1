@@ -16,7 +16,12 @@ Object::Sprite::Sprite(SDL_Renderer* renderer, SDL_Texture* _texture, int width,
 }
 
 
-void Object::Sprite::setState(int state, void(*callback)())
+int Object::Sprite::getState() const
+{
+	return _spriteState;
+}
+
+void Object::Sprite::setState(int state, std::function<void(void)> callback)
 {
 	if (_spriteState == state || _frameCount.empty() || _frameCount.size() <= state)
 		return;
@@ -74,5 +79,5 @@ void Object::render()
 
 bool Object::isCollidingWith(const Object* other) const
 {
-	return Utils::isColliding(_rect, other->_rect);
+	return Utils::isColliding(_rect, other->_rect) && other->_collisionEnabled;
 }

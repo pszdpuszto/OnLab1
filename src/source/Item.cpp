@@ -6,6 +6,8 @@
 #include <format>
 
 #include "../header/Game.hpp"
+#include "../header/Object.hpp"
+#include "../header/Enemy.hpp"
 
 const std::map<Item::Rarity, Utils::RGB> Item::RARITY_COLORS = {
 		{ TRASH, { 0x7f, 0x7f, 0x7f } },
@@ -217,7 +219,7 @@ void Ring::update()
 		_count--;
 }
 
-void Ring::renderCooldown(SDL_FRect destRect)
+void Ring::renderCooldown(SDL_FRect destRect) const
 {
 	destRect.w *= (_count / _cooldown);
 	GAME->renderFullRect(destRect, { 255, 255, 0 });
@@ -257,8 +259,8 @@ void Weapon::render()
 {
 	_sprite->render();
 }
-
-void Weapon::renderCooldown(SDL_FRect destRect)
+ 
+void Weapon::renderCooldown(SDL_FRect destRect) const
 {
 	destRect.w *= (_count / _cooldown);
 	GAME->renderFullRect(destRect, { 255, 0, 255 });
@@ -288,7 +290,15 @@ MeleeWeapon::MeleeWeapon(std::string name, Rarity rarity, float dmg, float coold
 
 void MeleeWeapon::doAttack(bool attack)
 {
-	// TODO: hit detection
+	if (attack) {
+		MeleeSprite* sprite = static_cast<MeleeSprite*>(_sprite);
+		for (Object* obj : GAME->getCurrentLevel()->getCurrentRoom()->getObjects()) {
+			if (obj->getType() == Object::ObjectTypes::ENEMY && Utils::isColliding(sprite->getHitbox(), obj->getRect())) {
+				Enemy* enemy = static_cast<Enemy*>(obj);
+				enemy->takeDamage(_dmg, sprite->getAnimationLength());
+			}
+		}
+	}
 
 	Weapon::doAttack(attack);
 }
@@ -354,16 +364,42 @@ void MeleeWeapon::MeleeSprite::render()
 	_destRect.x = flip ? ld.from.x : ld.from.x - _destRect.w;
 	_destRect.y = ld.from.y - _destRect.h / 2.f;
 
+	// Hitbox points
+	float angle = Utils::DegToRad(a);
+	SDL_FPoint op = {
+		rPoint.x + _destRect.x,
+		rPoint.y + _destRect.y
+	};
+	auto rotate = [op, angle](SDL_FPoint p) {
+		return SDL_FPoint{
+					((p.x - op.x) * cos(angle)) - ((op.y - p.y) * sin(angle)) + op.x,
+			op.y -	((op.y - p.y) * cos(angle)) + ((p.x - op.x) * sin(angle))
+		}; 
+	};
+	_hitbox[0] = rotate({ _destRect.x, _destRect.y });
+	_hitbox[1] = rotate({ _destRect.x + _destRect.w, _destRect.y });
+	_hitbox[2] = rotate({ _destRect.x + _destRect.w, _destRect.y + _destRect.h });
+	_hitbox[3] = rotate({ _destRect.x,  _destRect.y + _destRect.h });
+
 #ifdef DEBUG_HITBOX
-	GAME->renderRect(_destRect, { 255,0,0 });
 	GAME->renderFullRect({ ld.from.x, ld.from.y, 1.f, 1.f }, { 0,255,0 });
+
+	for (int i = 0; i < 4; ++i) {
+		GAME->renderLine(_hitbox[i], _hitbox[(i + 1) % 4], { 255,0,0,255 });
+	}
+
 #endif
 	SDL_RenderTextureRotated(_renderer, _texture, &_srcRect, &_destRect, a, &rPoint, flip?SDL_FLIP_HORIZONTAL:SDL_FLIP_NONE);
 }
 
-SDL_FRect MeleeWeapon::MeleeSprite::getHitbox()
+const SDL_FPoint* MeleeWeapon::MeleeSprite::getHitbox() const
 {
-	return SDL_FRect();
+	return &(_hitbox[0]);
+}
+
+float MeleeWeapon::MeleeSprite::getAnimationLength() const
+{
+	return _animationLength;
 }
 
 RangedWeapon::RangedSprite::RangedSprite(Sprite sprite) : Sprite{ sprite }, _muzzleFlashTexture{ GAME->getMuzzleTexture() }
@@ -421,7 +457,7 @@ void RangedWeapon::RangedSprite::render()
 
 }
 
-SDL_FPoint RangedWeapon::RangedSprite::getBulletPoint()
+SDL_FPoint RangedWeapon::RangedSprite::getBulletPoint() const
 {
 	return _bulletPoint;
 }
@@ -445,7 +481,7 @@ void RangedWeapon::spawnBullet()
 Bullet* RangedWeapon::createBullet(float offset)
 {
 	SDL_FPoint bPoint = static_cast<RangedSprite*>(_sprite)->getBulletPoint();
-	return new Bullet(bPoint.x - 2.f, bPoint.y - 2.f, GAME->getPlayer()->getLookData().a + offset, _dmg, _velocity);
+	return new Bullet(bPoint.x - 2.f, bPoint.y - 2.f, GAME->getPlayer()->getLookData().a + offset, _dmg, _velocity, GAME->getPlayer());
 }
 
 void Shotgun::spawnBullet()

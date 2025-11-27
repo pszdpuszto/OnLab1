@@ -5,6 +5,8 @@
 #include "Utils.hpp"
 #include "ResourceManager.hpp"
 #include "Item.hpp"
+#include "Door.hpp"
+
 #include <functional>
 
 class Player : public Entity {
@@ -28,8 +30,13 @@ public:
 	void equipmentChange(bool equip, Item* item);
 
 	void heal(float amount);
+	void takeDamage(float amount);
+	void moveTo(Door::DoorType from);
 
 	ObjectTypes getType() override { return PLAYER; }
+protected:
+	void handleCollision(Object* collidedWith) override;
+
 private:
 	class InventoryManager {
 	public:

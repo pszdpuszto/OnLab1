@@ -47,6 +47,12 @@ void Entity::move(float a, float speedModifier)
 			return;
 		}
 	}
+	// collision with player
+	if (getType() != PLAYER && GAME->getPlayer() && this->isCollidingWith(GAME->getPlayer())) {
+		handleCollision(GAME->getPlayer());
+		return;
+	}
+
 	_rect.x = _rect.x;
 	_rect.y = _rect.y;
 }

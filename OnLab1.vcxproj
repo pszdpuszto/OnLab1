@@ -137,6 +137,8 @@
     <ClInclude Include="resource.h" />
     <ClInclude Include="src\header\Application.hpp" />
     <ClInclude Include="src\header\Consts.hpp" />
+    <ClInclude Include="src\header\Door.hpp" />
+    <ClInclude Include="src\header\Enemy.hpp" />
     <ClInclude Include="src\header\Entity.hpp" />
     <ClInclude Include="src\header\Game.hpp" />
     <ClInclude Include="src\header\Item.hpp" />
@@ -152,8 +154,9 @@
     <ClInclude Include="src\header\Utils.hpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\header\Projectile.cpp" />
     <ClCompile Include="src\source\Application.cpp" />
+    <ClCompile Include="src\source\Door.cpp" />
+    <ClCompile Include="src\source\Enemy.cpp" />
     <ClCompile Include="src\source\Entity.cpp" />
     <ClCompile Include="src\source\Game.cpp" />
     <ClCompile Include="src\source\Item.cpp" />
@@ -161,6 +164,7 @@
     <ClCompile Include="src\source\main.cpp" />
     <ClCompile Include="src\source\Object.cpp" />
     <ClCompile Include="src\source\Player.cpp" />
+    <ClCompile Include="src\source\Projectile.cpp" />
     <ClCompile Include="src\source\ResourceManager.cpp" />
     <ClCompile Include="src\source\Room.cpp" />
     <ClCompile Include="src\source\TestLevel.cpp" />

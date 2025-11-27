@@ -3,8 +3,7 @@
 #include <string>
 #include <map>
 #include <vector>
-
-#include <iostream>
+#include <functional>
 
 class Object {
 public:
@@ -12,7 +11,8 @@ public:
 	public:
 		Sprite(SDL_Renderer* renderer, SDL_Texture* _texture, int width, int height, const std::vector<int>& frameCount);
 
-		void setState(int state, void (*callback)() = nullptr);
+		int getState() const;
+		void setState(int state, std::function<void(void)> callback = nullptr);
 
 		void update();
 		void render(const SDL_FRect& _destRect, SDL_FlipMode mirror = SDL_FLIP_NONE, double rotation = 0.f) const;
@@ -25,14 +25,12 @@ public:
 		SDL_Texture* _texture;
 		SDL_Renderer* _renderer;
 
-		void (*_callback)();
+		std::function<void(void)> _callback;
 	};
 
 	Object(const std::string& textureName, float x, float y, float w, float h, bool hasCollision = true);
 	Object(const Object& other) = delete;
 	Object operator=(const Object& other) = delete;
-
-	~Object() { std::cout << "imded\n"; }
 
 	SDL_FRect getRect() const;
 
@@ -40,7 +38,7 @@ public:
 	virtual void render();
 
 	enum ObjectTypes {
-		OBJECT, ENTITY, PLAYER, ENEMY, PROJECTILE
+		OBJECT, ENTITY, PLAYER, ENEMY, PROJECTILE, DOOR
 	};
 	virtual ObjectTypes getType() { return OBJECT; }
 protected:

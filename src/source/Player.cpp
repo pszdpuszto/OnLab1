@@ -144,6 +144,38 @@ void Player::heal(float amount)
 		_health = _stats[Stats::HP];
 }
 
+void Player::takeDamage(float amount)
+{
+	_health -= amount;
+}
+
+void Player::moveTo(Door::DoorType from)
+{
+	static const float OFFSET_FROM_DOOR = 2.f;
+	static const std::map<Door::DoorType, SDL_FPoint> doorPositions = {
+		{ Door::NORTH, { Consts::ROOM_RECT.w / 2.f - _rect.w / 2.f, Consts::ROOM_RECT.h-Consts::ROOM_WALL_THICKNESS-_rect.h- OFFSET_FROM_DOOR } },
+		{ Door::SOUTH, { Consts::ROOM_RECT.w / 2.f - _rect.w / 2.f, Consts::ROOM_WALL_THICKNESS + OFFSET_FROM_DOOR } },
+		{ Door::WEST, { Consts::ROOM_RECT.w - Consts::ROOM_WALL_THICKNESS - _rect.w - OFFSET_FROM_DOOR, Consts::ROOM_RECT.h / 2.f - _rect.h / 2.f } },
+		{ Door::EAST, { Consts::ROOM_WALL_THICKNESS + OFFSET_FROM_DOOR, Consts::ROOM_RECT.h / 2.f - _rect.h / 2.f } }
+	};
+	SDL_FPoint newPos = doorPositions.at(from);
+	_rect.x = newPos.x;
+	_rect.y = newPos.y;
+}
+
+void Player::handleCollision(Object* collidedWith)
+{
+	if (collidedWith && collidedWith->getType() == DOOR) {
+		Door* door = static_cast<Door*>(collidedWith);
+		if (door->isOpen()) {
+			GAME->moveThroughDoor(door);
+		}
+	}
+	else {
+		Entity::handleCollision(collidedWith);
+	}
+}
+
 void Player::pMove()
 {
 	using namespace Utils;

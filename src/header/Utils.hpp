@@ -40,6 +40,43 @@ namespace Utils {
 			rect2.x, rect2.y, rect2.w, rect2.h);
 	}
 
+	static bool isColliding(const SDL_FPoint* rect1, SDL_FRect rect2) {
+		static auto ccw = [](SDL_FPoint A, SDL_FPoint B, SDL_FPoint C) {
+			return (C.y - A.y) * (B.x - A.x) > (B.y - A.y) * (C.x - A.x);
+		};
+
+		static auto intersect = [](SDL_FPoint A, SDL_FPoint B, SDL_FPoint C, SDL_FPoint D) {
+			return (ccw(A, C, D) != ccw(B, C, D)) && (ccw(A, B, C) != ccw(A, B, D));
+		};
+
+		SDL_FPoint rect2Points[4] = {
+			{ rect2.x, rect2.y },
+			{ rect2.x + rect2.w, rect2.y },
+			{ rect2.x + rect2.w, rect2.y + rect2.h },
+			{ rect2.x, rect2.y + rect2.h }
+		};
+
+		for (int i = 0; i < 4; i++) {
+			for (int j = 0; j < 4; j++) {
+				//SDL_Log("Checking edge (%f, %f) - (%f, %f) and (%f, %f) - (%f, %f)", rect1[i].x, rect1[i].y, rect1[(i + 1) % 4].x, rect1[(i + 1) % 4].y, rect2Points[j].x, rect2Points[j].y, rect2Points[(j + 1) % 4].x, rect2Points[(j + 1) % 4].y);
+				if (intersect(
+					rect1[i],
+					rect1[(i + 1) % 4],
+					rect2Points[j],
+					rect2Points[(j + 1) % 4]
+				)) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
+	static float dist(SDL_FPoint p1, SDL_FPoint p2) {
+		return sqrtf((p2.x - p1.x) * (p2.x - p1.x) +
+			(p2.y - p1.y) * (p2.y - p1.y));
+	}
+
 	static inline void destroyTexture(SDL_Texture* _texture) {
 		if (_texture != nullptr && SDL_WasInit(SDL_INIT_VIDEO)) {
 			SDL_DestroyTexture(_texture);

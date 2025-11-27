@@ -43,9 +43,6 @@
     <Filter Include="Source Files\object\entity">
       <UniqueIdentifier>{ef3d8033-319b-4bc5-a547-9f92a3085cc5}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\object\player">
-      <UniqueIdentifier>{e0238d67-b140-4d32-b1ca-401125cdf4e0}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\object\obstacle">
       <UniqueIdentifier>{f6bb98ff-4e40-4e5c-b047-056c51feeb39}</UniqueIdentifier>
     </Filter>
@@ -57,6 +54,15 @@
     </Filter>
     <Filter Include="Source Files\item">
       <UniqueIdentifier>{9c6d042a-cbbc-41ea-bfd4-1b288fceb19a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\object\entity\enemy">
+      <UniqueIdentifier>{61784e1e-3bde-42f8-b063-619ac9e2710e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\object\entity\enemy">
+      <UniqueIdentifier>{13c900e5-7f27-4192-ae87-fb033895615b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\object\entity\player">
+      <UniqueIdentifier>{e0238d67-b140-4d32-b1ca-401125cdf4e0}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -113,6 +119,12 @@
     <ClInclude Include="src\header\Projectile.hpp">
       <Filter>Header Files\object\entity</Filter>
     </ClInclude>
+    <ClInclude Include="src\header\Enemy.hpp">
+      <Filter>Header Files\object\entity\enemy</Filter>
+    </ClInclude>
+    <ClInclude Include="src\header\Door.hpp">
+      <Filter>Header Files\object</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\source\Application.cpp">
@@ -134,7 +146,7 @@
       <Filter>Source Files\object</Filter>
     </ClCompile>
     <ClCompile Include="src\source\Player.cpp">
-      <Filter>Source Files\object\player</Filter>
+      <Filter>Source Files\object\entity\player</Filter>
     </ClCompile>
     <ClCompile Include="src\source\ResourceManager.cpp">
       <Filter>Source Files\core</Filter>
@@ -151,7 +163,13 @@
     <ClCompile Include="src\source\Item.cpp">
       <Filter>Source Files\item</Filter>
     </ClCompile>
-    <ClCompile Include="src\header\Projectile.cpp">
+    <ClCompile Include="src\source\Enemy.cpp">
+      <Filter>Source Files\object\entity\enemy</Filter>
+    </ClCompile>
+    <ClCompile Include="src\source\Door.cpp">
+      <Filter>Source Files\object</Filter>
+    </ClCompile>
+    <ClCompile Include="src\source\Projectile.cpp">
       <Filter>Source Files\object\entity</Filter>
     </ClCompile>
   </ItemGroup>
