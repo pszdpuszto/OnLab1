@@ -1,6 +1,5 @@
 #include "../header/Item.hpp"
 
-#include <sstream>
 #include <algorithm>
 #include <cstdlib>
 #include <format>
@@ -9,7 +8,7 @@
 #include "../header/Object.hpp"
 #include "../header/Enemy.hpp"
 
-const std::map<Item::Rarity, Utils::RGB> Item::RARITY_COLORS = {
+const std::map<Item::Rarity, SDL_Color> Item::RARITY_COLORS = {
 		{ TRASH, { 0x7f, 0x7f, 0x7f } },
 		{ BORING, { 0x00, 0xff, 0x88 } },
 		{ USEFUL, { 0x00, 0x22, 0xaa } },
@@ -23,11 +22,6 @@ Item::Item(std::string name, Rarity rarity, Type type, const Stats::stat_t& stat
 	_stats{ stats },
 	_sprite{ GAME->createItemSprite(name)} {
 	generateDescrSprite();
-}
-
-std::string Item::getExtraDescription() const
-{
-	return "";
 }
 
 Item::~Item()
@@ -50,7 +44,7 @@ bool Item::isType(Type type) const
 	return _type == type;
 }
 
-void Item::render(Utils::floatPoint pos, bool outline) const
+void Item::render(SDL_FPoint pos, bool outline) const
 {
 	if (outline) {
 		SDL_FRect outlineRect{
@@ -73,7 +67,7 @@ void Item::render(Utils::floatPoint pos, bool outline) const
 	_sprite.render(destRect);
 }
 
-void Item::renderDescription(Utils::floatPoint mousePos) const
+void Item::renderDescription(SDL_FPoint mousePos) const
 {
 	_descrSprite->setPosFitToWindow(mousePos.x + 12.f, mousePos.y + 2.f);
 	_descrSprite->render();
@@ -81,10 +75,14 @@ void Item::renderDescription(Utils::floatPoint mousePos) const
 
 void Item::generateDescrSprite()
 {
+	if (_descrSprite) {
+		delete _descrSprite;
+	}
+
 	std::ostringstream oss;
 
 	// rarity colored name
-	Utils::RGB color = RARITY_COLORS.at(_rarity);
+	SDL_Color color = RARITY_COLORS.at(_rarity);
 	std::string nameToUpper{ _name };
 	std::transform(nameToUpper.begin(), nameToUpper.end(), nameToUpper.begin(), ::toupper);
 	oss << "$S8$$C" 
@@ -96,10 +94,11 @@ void Item::generateDescrSprite()
 	// stats
 	oss << "$S8$$C255,255,255$";
 	for (const auto& entry : _stats) {
-		oss << Stats::statToString(entry.first) << ": +" << entry.second << "$N$";
+		oss << Stats::statToString(entry) << "$N$";
 	}
 
-	oss << getExtraDescription();
+	// extra description
+	addExtraDescription(oss);
 
 	_descrSprite = GAME->createTextSprite(
 		oss.str(),
@@ -189,20 +188,46 @@ Stats::stat_t& Stats::operator-=(stat_t& a, const stat_t& b)
 	return a;
 }
 
-std::string Stats::statToString(Stat stat)
-{
-	static const std::map<Stat, std::string> statStrings = {
-		{ SPD, "Speed" },
-		{ HP, "Health" },
-		{ REGEN, "Health Regen" },
-		{ ARMOR, "Armor" },
-		{ DMG, "Damage" },
-		{ ATK_SPD, "Attack Speed" },
-		{ LIFESTEAL, "Lifesteal" }
-	};
+const std::map<Stats::Stat, std::string> Stats::name = {
+	{ SPD, "Speed" },
+	{ HP, "Health" },
+	{ REGEN, "Regen" },
+	{ ARMOR, "Armor" },
+	{ DMG, "Damage" },
+	{ ATK_SPD, "Att. Speed" },
+	{ LIFESTEAL, "Lifesteal" }
+};
 
-	return statStrings.at(stat);
+std::string Stats::statToString(std::pair<Stat, float> stat, bool asAddition)
+{
+	std::ostringstream oss;
+	oss << Stats::name.at(stat.first) << ": ";
+	if (asAddition && stat.second >= 0) {
+		oss << "+";
+	}
+
+	switch (stat.first) {
+	case HP:
+		oss << stat.second;
+		break;
+	case REGEN:
+		oss << stat.second * Consts::TARGET_FPS << "/s";
+		break;
+	default:
+		oss << (stat.second * 100.f) << "%";
+		break;
+	}
+
+	return oss.str();
 }
+
+Ring::Ring(std::string name, Rarity rarity, float cooldown) :
+	Item{ name, rarity, RING, {} }, 
+	_cooldown{ cooldown * Consts::TARGET_FPS }, 
+	_count{ 0.f } {
+	generateDescrSprite();
+};
+
 
 void Ring::use()
 {
@@ -221,18 +246,64 @@ void Ring::update()
 
 void Ring::renderCooldown(SDL_FRect destRect) const
 {
+	if (_count <= 0)
+		return;
 	destRect.w *= (_count / _cooldown);
 	GAME->renderFullRect(destRect, { 255, 255, 0 });
 }
+
+void Ring::addExtraDescription(std::ostringstream& oss) const
+{
+	oss << "Cooldown: " << _cooldown / Consts::TARGET_FPS << "s$N$";
+}
+
+HealingRing::HealingRing(std::string name, Rarity rarity, float healAmount, float cooldown) : 
+	Ring{ name, rarity, cooldown }, 
+	_healAmount{ healAmount } {
+	generateDescrSprite();
+};
 
 void HealingRing::doUse()
 {
 	GAME->getPlayer()->heal(_healAmount);
 }
 
+void HealingRing::addExtraDescription(std::ostringstream& oss) const
+{
+	Ring::addExtraDescription(oss);
+	oss << "Heals: " << _healAmount << "HP$N$";
+}
+
+DeathRing::DeathRing() : 
+	Ring{ "Ring of Death", USEFUL, 30.f } {
+	generateDescrSprite();
+}
+
 void DeathRing::doUse()
 {
-	// TODO
+	float minDist = -1.f;
+	Enemy* closestEnemy = nullptr;
+	std::vector<Object*> objects = GAME->getCurrentLevel()->getCurrentRoom()->getObjects();
+	for (Object* obj : objects) {
+		if (obj->getType() == Object::ObjectTypes::ENEMY) {
+			Enemy* enemy = static_cast<Enemy*>(obj);
+			float dist = Utils::rectDist(GAME->getPlayer()->getRect(), enemy->getRect());
+			if (!closestEnemy || dist < minDist) {
+				minDist = dist;
+				closestEnemy = enemy;
+			}
+		}
+	}
+
+	if (closestEnemy) {
+		closestEnemy->takeDamage(250.f, 0.f);
+	}
+}
+
+void DeathRing::addExtraDescription(std::ostringstream& oss) const
+{
+	Ring::addExtraDescription(oss);
+	oss << "Deals 250 dmg to the closest enemy$N$";
 }
 
 Weapon::Weapon(std::string name, Rarity rarity, float dmg, float cooldown, Sprite* sprite)
@@ -249,8 +320,8 @@ Weapon::~Weapon()
 void Weapon::update(bool attack)
 {
 	_sprite->update();
-	if (_count)
-		_count--;
+	if (_count > 0)
+		_count -= GAME->getPlayer()->getStats().at(Stats::ATK_SPD);
 	else
 		doAttack(attack);
 }
@@ -262,6 +333,8 @@ void Weapon::render()
  
 void Weapon::renderCooldown(SDL_FRect destRect) const
 {
+	if (_count <= 0)
+		return;
 	destRect.w *= (_count / _cooldown);
 	GAME->renderFullRect(destRect, { 255, 0, 255 });
 }
@@ -279,9 +352,9 @@ void Weapon::doAttack(bool attack)
 	}
 }
 
-std::string Weapon::getExtraDescription() const
+void Weapon::addExtraDescription(std::ostringstream& oss) const
 {
-	return std::format("Damage: {}$N$Attack/second: {}", _dmg, Consts::TARGET_FPS / _cooldown);
+	oss << "Damage: " << _dmg  << "$N$Attack/s: "<< Consts::TARGET_FPS / _cooldown;
 }
 
 MeleeWeapon::MeleeWeapon(std::string name, Rarity rarity, float dmg, float cooldown, float width, float height, float attackLength) :
@@ -402,7 +475,9 @@ float MeleeWeapon::MeleeSprite::getAnimationLength() const
 	return _animationLength;
 }
 
-RangedWeapon::RangedSprite::RangedSprite(Sprite sprite) : Sprite{ sprite }, _muzzleFlashTexture{ GAME->getMuzzleTexture() }
+RangedWeapon::RangedSprite::RangedSprite(Sprite sprite) : 
+	Sprite{ sprite },
+	_muzzleFlashTexture{ GAME->getTexture("muzzleFlash")}
 {
 }
 

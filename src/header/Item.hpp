@@ -4,6 +4,7 @@
 
 #include <string>
 #include <map>
+#include <sstream>
 
 #include "Utils.hpp"
 #include "ResourceManager.hpp"
@@ -30,8 +31,10 @@ namespace Stats {
 	stat_t operator-(const stat_t& a, const stat_t& b);
 	stat_t& operator-=(stat_t& a, const stat_t& b);
 
-	std::string statToString(Stat stat);
-}
+	const extern std::map<Stat, std::string> name;
+
+	std::string statToString(std::pair<Stat, float> stat, bool asAddition=true);
+};
 #pragma endregion
 
 #pragma region item
@@ -72,17 +75,17 @@ public:
 
 	bool isType(Type type) const;
 
-	void render(Utils::floatPoint pos, bool outline=true) const;
-	void renderDescription(Utils::floatPoint mousePos) const;
+	void render(SDL_FPoint pos, bool outline=true) const;
+	void renderDescription(SDL_FPoint mousePos) const;
 
 protected:
 	Item(std::string name, Rarity rarity, Type type, const Stats::stat_t& stats);
 
-	virtual std::string getExtraDescription() const;
+	virtual void addExtraDescription(std::ostringstream& oss) const {};
 	virtual void generateDescrSprite();
 
 private:
-	static const std::map<Rarity, Utils::RGB> RARITY_COLORS;
+	static const std::map<Rarity, SDL_Color> RARITY_COLORS;
 
 	std::string _name;
 	Rarity _rarity;
@@ -98,22 +101,24 @@ private:
 
 class Ring : public Item {
 public:
-	Ring(std::string name, Rarity rarity, float cooldown) : Item{ name, rarity, RING, {} }, _cooldown{ cooldown * Consts::TARGET_FPS }, _count{ 0.f } {};
+	Ring(std::string name, Rarity rarity, float cooldown);
 	void use();
 
 	void update();
 	void renderCooldown(SDL_FRect destRect) const;
 protected:
 	virtual void doUse() = 0;
+	virtual void addExtraDescription(std::ostringstream& oss) const override;
 private:
 	float _cooldown, _count;
 };
 
 class HealingRing : public Ring {
 public:
-	HealingRing(std::string name, Rarity rarity, float healAmount, float cooldown) : Ring{ name, rarity, cooldown }, _healAmount{ healAmount } {};
+	HealingRing(std::string name, Rarity rarity, float healAmount, float cooldown);
 protected:
 	void doUse() override;
+	void addExtraDescription(std::ostringstream& oss) const override;
 private:
 	float _healAmount;
 };
@@ -136,9 +141,10 @@ public: DiamondRing() : HealingRing{ "Diamond ring", RARE, 100.f, 15.f } {};
 
 class DeathRing : public Ring {
 public: 
-	DeathRing() : Ring{ "Eing of Death", USEFUL, 30.f } {};
+	DeathRing();
 protected:
 	void doUse() override;
+	void addExtraDescription(std::ostringstream& oss) const override;
 };
 #pragma endregion
 
@@ -176,7 +182,7 @@ public:	RegenAmulet() : Amulet{ "Amulet of Regeneration", RARE, {
 };
 
 class VampireAmulet : public Amulet {
-public:	VampireAmulet() : Amulet{ "Amulet of Speed", RARE, {
+public:	VampireAmulet() : Amulet{ "Vampire Amulet", RARE, {
 														{ Stats::LIFESTEAL, .4f }
 													} } {};
 };
@@ -311,7 +317,7 @@ protected:
 	void resetCooldown();
 	virtual void doAttack(bool attack);
 
-	std::string getExtraDescription() const;
+	virtual void addExtraDescription(std::ostringstream& oss) const;
 private:
 	float _cooldown, _count;
 };

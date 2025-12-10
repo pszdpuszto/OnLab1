@@ -64,6 +64,12 @@
     <Filter Include="Source Files\object\entity\player">
       <UniqueIdentifier>{e0238d67-b140-4d32-b1ca-401125cdf4e0}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\UI">
+      <UniqueIdentifier>{32a31d29-2d63-4951-a96b-21cce3da836c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\UI">
+      <UniqueIdentifier>{411a8dae-af7e-40f0-98c1-79b9594dc9dc}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Assets\bg.png">
@@ -128,6 +134,9 @@
     <ClInclude Include="src\header\DroppedItem.hpp">
       <Filter>Header Files\item</Filter>
     </ClInclude>
+    <ClInclude Include="src\header\Button.hpp">
+      <Filter>Header Files\UI</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\source\Application.cpp">
@@ -177,6 +186,9 @@
     </ClCompile>
     <ClCompile Include="src\source\DroppedItem.cpp">
       <Filter>Source Files\item</Filter>
+    </ClCompile>
+    <ClCompile Include="src\source\Button.cpp">
+      <Filter>Source Files\UI</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

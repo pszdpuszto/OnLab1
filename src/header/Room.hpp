@@ -6,6 +6,7 @@
 #include "object.hpp"
 #include "entity.hpp"
 #include "door.hpp"
+#include "enemy.hpp"
 
 class Room {
 public:
@@ -18,7 +19,7 @@ public:
 	};
 
 	void addObject(Object* obj);
-	void enemyDead();
+	void enemyDead(Enemy* enemy);
 
 	void update();
 	void render() const;

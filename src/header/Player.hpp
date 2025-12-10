@@ -6,8 +6,10 @@
 #include "ResourceManager.hpp"
 #include "Item.hpp"
 #include "Door.hpp"
+#include "Button.hpp"
 
 #include <functional>
+#include <string>
 
 class Player : public Entity {
 public:
@@ -16,8 +18,11 @@ public:
 
 	int getInvState() const;
 	struct LookData { SDL_FPoint from; float a; } getLookData();
+	Stats::stat_t getStats() const;
+	int getLevel() const;
 
 	void openInventory();
+	void switchSkillTree();
 	void mouseDown();
 	void mouseUp();
 
@@ -30,9 +35,13 @@ public:
 	void pickUpItem();
 
 	void equipmentChange(bool equip, Item* item);
+	void addSkillStat(Stats::stat_t stat);
+	void unlockSlot(Item::Type type);
 
 	void heal(float amount);
 	void takeDamage(float amount);
+	void dealDamage(float amount);
+	void addXP(int amount);
 	void moveTo(Door::DoorType from);
 
 	ObjectTypes getType() override { return PLAYER; }
@@ -44,20 +53,25 @@ private:
 	public:
 		class ItemSlot {
 		public:
-			ItemSlot(const Utils::floatPoint& pos, Player* player = nullptr, std::function<bool(Item*)> filter = [](Item* _) {return true;});
+			ItemSlot(const SDL_FPoint& pos, Player* player = nullptr, std::function<bool(Item*)> filter = [](Item* _) {return true;}, bool locked=false);
 			~ItemSlot();
 
 			Item* getItem() const;
 			Item* swapItem(Item* item);
 
-
+			void unlock();
 			void render() const;
 			void renderDescr() const;
 		private:
+			static ResourceManager::StaticSprite* LOCK_SPRITE;
+
 			Player* _player;
-			Utils::floatPoint _pos;
+			SDL_FPoint _pos;
 			Item* _item;
 			std::function<bool(Item*)> _filter;
+			bool _locked = false;
+
+			void renderLock() const;
 		};
 
 		InventoryManager(Player* player, ResourceManager::TextSprite** statSprite);
@@ -75,6 +89,7 @@ private:
 		void mouseUp();
 
 		void setAttack(bool attack);
+		void unlockSlot(Item::Type type);
 
 		void update();
 		void render() const;
@@ -85,13 +100,15 @@ private:
 		static const SDL_FRect INV_SPRITE_RECT;
 		static const SDL_FRect INV_RECT;
 		static const SDL_FRect EQ_RECT;
-		static Utils::floatPoint STAT_POS;
+		static const SDL_FRect SKILLTREE_BTN_RECT;
+		static SDL_FPoint STAT_POS;
 
 		ResourceManager::StaticSprite* _invSprite;
 		ResourceManager::TextSprite** _statsSprite;
 
 		ItemSlot* _inv[INV_COLS * INV_ROWS];
 		std::map<Item::Type, ItemSlot*> _equippedItems;
+		Button _skillTreeBtn;
 
 		Item* _draggedItem = nullptr;
 		ItemSlot* _dragSource = nullptr;
@@ -104,6 +121,63 @@ private:
 		ItemSlot* getInvItemSlotUnderCursor() const;
 		ItemSlot* getEqItemSlotUnderCursor() const;
 	};
+
+	class SkillTree {
+	public:
+		SkillTree(Player* player);
+		~SkillTree();
+
+		void render() const;
+		void levelUp(int level);
+
+		void mouseDown();
+		void mouseUp();
+
+		void renderLevel(SDL_FRect dest) const;
+	private:
+		class SkillNode {
+		public:
+			SkillNode(std::string name, Stats::stat_t stat, SDL_FRect rect, std::function<void(Stats::stat_t)> addStats, SkillNode* parent = nullptr, std::string extraDescr="");
+			~SkillNode();
+			
+			bool isUnlocked() const;
+
+			void render(bool hasPoints) const;
+			void renderDescr(SDL_FPoint mousePos);
+
+			bool handleClick();
+		private:
+			Stats::stat_t _stats;
+			std::function<void(Stats::stat_t)> _addStats;
+			bool _unlocked = false;
+			SDL_FRect _rect;
+			SkillNode* _parent;
+
+			ResourceManager::TextSprite* _descriptionSprite;
+
+			void createDescriptionSprite(std::string name, std::string extraDescr);
+			bool unlockable() const;
+		};
+
+		static const SDL_FRect SKILLTREE_RECT;
+		static const SDL_FRect SKILLPOINTS_RECT;
+		static const SDL_FRect LEVEL_RECT;
+		static const SDL_FRect BACK_BTN_RECT;
+
+		static ResourceManager::TextSprite* createNumberSprite(int value);
+
+		int _skillPoints = 0;
+		Button _backBtn;
+		std::vector<SkillNode*> _skills;
+
+		ResourceManager::StaticSprite* _skillTreeSprite;
+		ResourceManager::TextSprite* _skillPointsSprite;
+		ResourceManager::TextSprite* _LevelSprite;
+
+		void updateSkillPointsSprite();
+		void createSkills(Player* player);
+	};
+
 	enum playerState {
 		IDLE = 0,
 		MOVING
@@ -114,7 +188,12 @@ private:
 		SKILLTREE
 	} _invState = CLOSED;
 
+	static int getXpNeeded(int level);
+
 	float _health;
+	int _lvl;
+	int _xp = 0;
+	int _xpNeeded;
 
 	Stats::stat_t _stats = {
 		{ Stats::SPD, 1.f },
@@ -127,13 +206,14 @@ private:
 	};
 
 	InventoryManager _invMgr;
+	SkillTree _skillTree;
 
 	ResourceManager::TextSprite* _statsSprite;
 
 	ResourceManager::TextSprite* createStatsSprite();
 
-
 	void pMove();
+	void levelUp();
 
 	void renderHUD();
 	void renderInventory() const;

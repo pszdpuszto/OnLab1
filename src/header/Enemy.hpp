@@ -8,9 +8,10 @@
 class Enemy : public Entity
 {
 public:
-	Enemy(const std::string& textureName, float x, float y, float w, float h, float hp, float dmg, float speed);
+	Enemy(const std::string& textureName, float x, float y, float w, float h, float hp, float dmg, float speed, float range);
 
 	ObjectTypes getType() override { return ENEMY; }
+	virtual int getXp();
 
 	void render() override;
 	bool update() override;
@@ -29,20 +30,23 @@ protected:
 	PlayerData calcPlayerData() const;
 	virtual void moveLogic() = 0;
 	virtual void deathLogic();
-	float _maxHp, _hp, _dmg;
+	float _maxHp, _hp, _dmg, _range;
 private:
-	void renderHpBar() const;
 	float _inv = 0;
+
+	void renderHpBar() const;
 };
 
 class MeleeEnemy : public Enemy
 {
 public:
-	MeleeEnemy(const std::string& textureName, float x, float y, float w, float h, float hp, float dmg, float speed);
+	MeleeEnemy(const std::string& textureName, float x, float y, float w, float h, float hp, float dmg, float speed, float range=2.f);
 protected:
+
 	void handleCollision(Object* collidedWith) override;
+	bool canReachPlayer() const;
 	virtual void moveLogic() override;
-	virtual void doAttack(float range=2.f);
+	virtual void doAttack();
 };
 
 class Goblin : public MeleeEnemy
@@ -62,11 +66,13 @@ public: Thief(float x, float y) : MeleeEnemy{ "thief", x, y, 20.f, 21.f, 50.f, 5
 
 class SmallSpider : public MeleeEnemy
 {
-public: SmallSpider(float x, float y) : MeleeEnemy{ "smallSpider", x, y, 16.f, 16.f, 50.f, 60.f, 1.5f } {};
+public: 
+	SmallSpider(float x, float y) : MeleeEnemy{ "smallSpider", x, y, 16.f, 16.f, 50.f, 60.f, 1.5f, 10.f } {};
+	int getXp() override;
 protected:
 	bool update() override;
 	void deathLogic() override;
-	void doAttack(float _=10.f) override;
+	void doAttack() override;
 private :
 	enum state_t {
 		IDLE = 0,
@@ -85,7 +91,6 @@ protected:
 	void moveLogic() override;
 	virtual Projectile* createProjectile(float angle);
 private:
-	float _range;
 	float _fireCooldown;
 	float _count;
 
@@ -100,7 +105,7 @@ public: GoblinThrower(float x, float y) : RangedEnemy{ "goblinThrow", x, y, 14.f
 class SpiderMother : public Enemy 
 {
 public: SpiderMother(float x, float y)
-	: Enemy{ "spiderBig", x, y, 24.f, 24.f, 200.f, 0.f, 0.f },
+	: Enemy{ "spiderBig", x, y, 24.f, 24.f, 200.f, 0.f, 0.f, 0.f },
 	_spawnCooldown{ 5.f * Consts::TARGET_FPS },
 	_count{ _spawnCooldown } {};
 protected: 

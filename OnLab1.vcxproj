@@ -136,6 +136,7 @@
   <ItemGroup>
     <ClInclude Include="resource.h" />
     <ClInclude Include="src\header\Application.hpp" />
+    <ClInclude Include="src\header\Button.hpp" />
     <ClInclude Include="src\header\Consts.hpp" />
     <ClInclude Include="src\header\Door.hpp" />
     <ClInclude Include="src\header\DroppedItem.hpp" />
@@ -156,6 +157,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\source\Application.cpp" />
+    <ClCompile Include="src\source\Button.cpp" />
     <ClCompile Include="src\source\Door.cpp" />
     <ClCompile Include="src\source\DroppedItem.cpp" />
     <ClCompile Include="src\source\Enemy.cpp" />

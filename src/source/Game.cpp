@@ -71,7 +71,7 @@ Utils::WASDState Game::getWASDState() const
 	return _wasdState;
 }
 
-Utils::floatPoint Game::getMousePosition() const
+SDL_FPoint Game::getMousePosition() const
 {
 	return _mousePosition;
 }
@@ -99,7 +99,7 @@ void Game::closestPickupableItemCandidate(DroppedItem* item)
 	}
 }
 
-DroppedItem* Game::getClosestPickupableItem()
+DroppedItem* Game::getClosestPickupableItem() const
 {
 	return _closestDroppedItem.item;
 }
@@ -125,7 +125,7 @@ Item::Sprite Game::createItemSprite(const std::string& name) const
 	};
 }
 
-Weapon::Sprite Game::createWeaponSprite(const std::string& name, float width, float height, float animationLength)
+Weapon::Sprite Game::createWeaponSprite(const std::string& name, float width, float height, float animationLength) const
 {
 	return Weapon::Sprite{
 		_renderer,
@@ -135,9 +135,18 @@ Weapon::Sprite Game::createWeaponSprite(const std::string& name, float width, fl
 	};
 }
 
-SDL_Texture* Game::getMuzzleTexture()
+Button::Sprite Game::createButtonSprite(const std::string& textureName, const SDL_FRect& destRect) const
 {
-	return _resourceManager->getTexture("muzzleFlash");
+	return Button::Sprite{
+		_renderer,
+		_resourceManager->getTexture(textureName),
+		destRect
+	};
+}
+
+SDL_Texture* Game::getTexture(std::string name)
+{
+	return _resourceManager->getTexture(name);
 }
 
 ResourceManager::StaticSprite* Game::createStaticSprite(const std::string& textureName, const SDL_FRect& destRect) const
@@ -154,13 +163,13 @@ ResourceManager::TextSprite* Game::createTextSprite(const std::string& text, con
 	return _resourceManager->createTextSprite(text, bgColor);
 }
 
-void Game::renderFullRect(const SDL_FRect& rect, const Utils::RGB& color) const
+void Game::renderFullRect(const SDL_FRect& rect, const SDL_Color color, float alpha) const
 {
-	SDL_SetRenderDrawColor(_renderer, color.r, color.g, color.b, 255);
+	SDL_SetRenderDrawColor(_renderer, color.r, color.g, color.b, static_cast<Uint8>(0xff * alpha));
 	SDL_RenderFillRect(_renderer, &rect);
 }
 
-void Game::renderRect(const SDL_FRect& rect, const Utils::RGB& color) const
+void Game::renderRect(const SDL_FRect& rect, const SDL_Color& color) const
 {
 	SDL_SetRenderDrawColor(_renderer, color.r, color.g, color.b, 255);
 	SDL_RenderRect(_renderer, &rect);
@@ -181,7 +190,7 @@ void Game::renderLine(const SDL_FPoint p1, const SDL_FPoint p2, const SDL_Color 
 
 bool Game::isMouseInRect(const SDL_FRect& rect) const
 {
-	Utils::floatPoint mousePos = getMousePosition();
+	SDL_FPoint mousePos = getMousePosition();
 	return Utils::isColliding(
 		mousePos.x, mousePos.y, 0.f, 0.f,
 		rect.x, rect.y, rect.w, rect.h
@@ -325,7 +334,7 @@ void Game::render()
 	_player->renderInv();
 
 	/* CURSOR */
-	Utils::floatPoint mousePos = getMousePosition();
+	SDL_FPoint mousePos = getMousePosition();
 	_cursorSprite[POINT]->setPos(mousePos.x, mousePos.y);
 	_cursorSprite[AIM]->setPos(mousePos.x-4.5f, mousePos.y-4.5f);
 

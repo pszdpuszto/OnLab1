@@ -59,7 +59,7 @@ void Entity::move(float a, float speedModifier)
 
 void Entity::handleCollision(Object* collidedWith)
 {
-	if (collidedWith)
+	if (collidedWith && collidedWith->getType() == OBJECT)
 		calcPosAfterCollision(collidedWith->getRect());
 }
 

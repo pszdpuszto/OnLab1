@@ -1,6 +1,7 @@
 #include "../header/Projectile.hpp"
 #include "../header/Enemy.hpp"
 #include "../header/Player.hpp"
+#include "../header/Game.hpp"
 
 Projectile::Projectile(const std::string& textureName, float x, float y, float w, float h, float speed, float a, float dmg, Entity* source)
 	: Entity{textureName, x, y, w, h, speed},
@@ -24,15 +25,20 @@ void Projectile::render()
 
 void Projectile::handleCollision(Object* that)
 {
+	float realDmg = _dmg;
+	if (_source && _source->getType() == PLAYER)
+		realDmg *= static_cast<Player*>(_source)->getStats().at(Stats::DMG);
 	if (that && that != _source) {
 		switch (that->getType()) {
 			case PROJECTILE:
 				return;
 			case PLAYER:
-				static_cast<Player*>(that)->takeDamage(_dmg);
+				static_cast<Player*>(that)->takeDamage(realDmg);
 				break;
 			case ENEMY:
-				static_cast<Enemy*>(that)->takeDamage(_dmg);
+				static_cast<Enemy*>(that)->takeDamage(realDmg);
+				if (_source->getType() == PLAYER)
+					GAME->getPlayer()->dealDamage(realDmg);
 				break;
 			default:
 				break;

@@ -72,7 +72,7 @@ public:
 
 private:
 	static const std::string ASSET_PATH;
-	static const Utils::RGB COLOR_KEY;
+	static const SDL_Color COLOR_KEY;
 
 	SDL_Renderer* _renderer;
 	std::map<std::string, ObjectTextureData> _objectTextures;

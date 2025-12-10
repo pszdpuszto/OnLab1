@@ -4,21 +4,6 @@
 
 namespace Utils {
 
-	struct RGB {
-		Uint8 r;
-		Uint8 g;
-		Uint8 b;
-	};
-
-	struct intPoint {
-		int x;
-		int y;
-	};
-	struct floatPoint {
-		float x;
-		float y;
-	};
-
 	enum WASD {
 		W = 0b0001,
 		S = 0b0010,
@@ -75,6 +60,18 @@ namespace Utils {
 	static float dist(SDL_FPoint p1, SDL_FPoint p2) {
 		return sqrtf((p2.x - p1.x) * (p2.x - p1.x) +
 			(p2.y - p1.y) * (p2.y - p1.y));
+	}
+
+	static float rectDist(SDL_FRect r1, SDL_FRect r2) {
+		SDL_FPoint p1 = {
+			r1.x + r1.w / 2.f,
+			r1.y + r1.h / 2.f
+		};
+		SDL_FPoint p2 = {
+			r2.x + r2.w / 2.f,
+			r2.y + r2.h / 2.f
+		};
+		return dist(p1, p2);
 	}
 
 	static inline void destroyTexture(SDL_Texture* _texture) {

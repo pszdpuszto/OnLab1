@@ -5,12 +5,18 @@
 
 #include <iostream>
 
-Enemy::Enemy(const std::string& textureName, float x, float y, float w, float h, float hp, float dmg, float speed) :
+Enemy::Enemy(const std::string& textureName, float x, float y, float w, float h, float hp, float dmg, float speed, float range) :
 	Entity(textureName, x, y, w, h, speed),
 	_maxHp{ hp },
 	_hp{ hp },
-	_dmg{ dmg }
+	_dmg{ dmg },
+	_range{ range }
 {}
+
+int Enemy::getXp()
+{
+	return static_cast<int>(_maxHp / 2);
+}
 
 void Enemy::render()
 {
@@ -59,7 +65,7 @@ void Enemy::deathLogic()
 		_collisionEnabled = false;
 		_sprite.setState(DIEING, [this]() {
 			_sprite.setState(DEAD);
-			GAME->getCurrentLevel()->getCurrentRoom()->enemyDead();
+			GAME->getCurrentLevel()->getCurrentRoom()->enemyDead(this);
 			});
 		return;
 	}
@@ -85,7 +91,7 @@ void Enemy::renderHpBar() const
 	GAME->renderFullRect(barFront, { 0xff, 0x00, 0x00 });
 }
 
-MeleeEnemy::MeleeEnemy(const std::string& textureName, float x, float y, float w, float h, float hp, float dmg, float speed) : Enemy{ textureName, x, y, w, h, hp, dmg, speed }
+MeleeEnemy::MeleeEnemy(const std::string& textureName, float x, float y, float w, float h, float hp, float dmg, float speed, float range) : Enemy{ textureName, x, y, w, h, hp, dmg, speed, range }
 {
 	_sprite.setState(MOVING);
 }
@@ -93,28 +99,42 @@ MeleeEnemy::MeleeEnemy(const std::string& textureName, float x, float y, float w
 void MeleeEnemy::handleCollision(Object* collidedWith)
 {
 	if (collidedWith && collidedWith->getType() == PLAYER) {
-		_sprite.setState(ATTACKING, [this]() {
-			_sprite.setState(MOVING);
-			doAttack();
-		});
 	}
 	Entity::handleCollision(collidedWith);
 }
 
-void MeleeEnemy::moveLogic()
+bool MeleeEnemy::canReachPlayer() const
 {
-	if (_sprite.getState() == MOVING)
-		move(calcPlayerData().angle);
+	return calcPlayerData().dist <=
+		std::max(GAME->getPlayer()->getRect().w, GAME->getPlayer()->getRect().h) / 2.f +
+		std::max(_rect.w, _rect.h) / 2.f + _range;
 }
 
-void MeleeEnemy::doAttack(float range)
+void MeleeEnemy::moveLogic()
 {
-	if (calcPlayerData().dist <= 
-		std::max(GAME->getPlayer()->getRect().w, GAME->getPlayer()->getRect().h) / 2.f + 
-		std::max(_rect.w, _rect.h) / 2.f + 
-		range) {
+	if (_sprite.getState() == MOVING) {
+		if (canReachPlayer()) {
+			_sprite.setState(ATTACKING, [this]() {
+				_sprite.setState(MOVING);
+				doAttack();
+			});
+		}
+		else {
+			move(calcPlayerData().angle);
+		}
+	}
+}
+
+void MeleeEnemy::doAttack()
+{
+	if (canReachPlayer()) {
 		GAME->getPlayer()->takeDamage(_dmg);
 	}
+}
+
+int SmallSpider::getXp()
+{
+	return 0;
 }
 
 bool SmallSpider::update()
@@ -134,18 +154,17 @@ void SmallSpider::deathLogic()
 	}
 }
 
-void SmallSpider::doAttack(float _)
+void SmallSpider::doAttack()
 {
-	MeleeEnemy::doAttack(10.f);
+	MeleeEnemy::doAttack();
 	_sprite.setState(DEAD);
 	_dead = true;
 }
 
 RangedEnemy::RangedEnemy(const std::string& textureName, float x, float y, float w, float h, float hp, float dmg, float speed, float fireCooldown, float range)
-	: Enemy{ textureName, x, y, w, h, hp, dmg, speed },
+	: Enemy{ textureName, x, y, w, h, hp, dmg, speed, range },
 	_fireCooldown{ fireCooldown * Consts::TARGET_FPS },
-	_count{ _fireCooldown },
-	_range{ range }
+	_count{ _fireCooldown }
 {
 	_sprite.setState(IDLE);
 }
@@ -156,7 +175,7 @@ void RangedEnemy::moveLogic()
 		_collisionEnabled = false;
 		_sprite.setState(DIEING, [this]() {
 			_sprite.setState(DEAD);
-			GAME->getCurrentLevel()->getCurrentRoom()->enemyDead();
+			GAME->getCurrentLevel()->getCurrentRoom()->enemyDead(this);
 			});
 		return;
 	}

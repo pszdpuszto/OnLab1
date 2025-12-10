@@ -5,7 +5,7 @@
 
 #include "../header/Game.hpp"
 
-const Utils::RGB ResourceManager::COLOR_KEY = { 0xff, 0x00, 0xff };
+const SDL_Color ResourceManager::COLOR_KEY = { 0xff, 0x00, 0xff };
 const std::string ResourceManager::ASSET_PATH = "Assets/";
 
 ResourceManager::ResourceManager(SDL_Renderer* renderer, const std::string& font)

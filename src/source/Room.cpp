@@ -1,12 +1,14 @@
 #include "../header/Room.hpp"
 #include "../header/Door.hpp"
 
+#include "../header/Game.hpp"
+
 Room::Room()
 {}
 
 void Room::initDoors(std::map<Door::DoorType, Room*> doors)
 {
-	for (auto i : doors) {
+	for (std::pair<Door::DoorType, Room*> i : doors) {
 		addObject(new Door(i.first, i.second));
 	}
 }
@@ -24,9 +26,10 @@ void Room::addObject(Object* obj)
 	_objects.push_back(obj);
 }
 
-void Room::enemyDead()
+void Room::enemyDead(Enemy* enemy)
 {
 	_enemyCount--;
+	GAME->getPlayer()->addXP(enemy->getXp());
 }
 
 void Room::update()

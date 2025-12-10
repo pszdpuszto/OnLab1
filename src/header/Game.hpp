@@ -10,10 +10,11 @@
 #include "Utils.hpp"
 #include "ResourceManager.hpp"
 #include "Item.hpp"
+#include "Button.hpp"
 
 #define GAME Game::getInstance()
 
-#define DEBUG_HITBOX
+//#define DEBUG_HITBOX
 
 class DroppedItem;
 
@@ -29,21 +30,22 @@ public:
 	Level* getCurrentLevel() const;
 	Player* getPlayer() const;
 	Utils::WASDState getWASDState() const;
-	Utils::floatPoint getMousePosition() const;
+	SDL_FPoint getMousePosition() const;
 
 	void moveThroughDoor(Door* door);
 	void closestPickupableItemCandidate(DroppedItem* item);
-	DroppedItem* getClosestPickupableItem();
+	DroppedItem* getClosestPickupableItem() const;
 
 	ResourceManager::StaticSprite* createStaticSprite(const std::string& textureName, const SDL_FRect& destRect) const;
 	ResourceManager::TextSprite* createTextSprite(const std::string& text, const SDL_Color& bgColor={0x00,0x00,0x00,0x00}) const;
 	Object::Sprite createObjectSprite(const std::string& textureName) const;
 	Item::Sprite createItemSprite(const std::string& name) const;
-	Weapon::Sprite createWeaponSprite(const std::string& name, float width, float height, float animationLength);
-	SDL_Texture* getMuzzleTexture(); // TODO better
+	Weapon::Sprite createWeaponSprite(const std::string& name, float width, float height, float animationLength) const;
+	Button::Sprite createButtonSprite(const std::string& textureName, const SDL_FRect& destRect) const;
+	SDL_Texture* getTexture(std::string name);
 
-	void renderFullRect(const SDL_FRect& rect, const Utils::RGB& color) const;
-	void renderRect(const SDL_FRect& rect, const Utils::RGB& color) const;
+	void renderFullRect(const SDL_FRect& rect, const SDL_Color color, float alpha=1.f) const;
+	void renderRect(const SDL_FRect& rect, const SDL_Color& color) const;
 	void dimScreen(float intensity) const;
 
 	void renderLine(const SDL_FPoint p1, const SDL_FPoint p2, const SDL_Color color) const;
@@ -67,7 +69,7 @@ private:
 	Level* _currentLevel;
 	Player* _player;
 	Utils::WASDState _wasdState = 0;
-	Utils::floatPoint _mousePosition = { 0.f, 0.f };
+	SDL_FPoint _mousePosition = { 0.f, 0.f };
 
 	struct { DroppedItem* item; float dist; } _closestDroppedItem = { nullptr, 0.f };
 
